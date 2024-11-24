@@ -1,0 +1,64 @@
+.mini-games {
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* Espaciado entre los juegos */
+    background: linear-gradient(135deg, #2a2a2a, #333333); /* Fondo oscuro con gradiente suave */
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.mini-games:hover {
+    transform: translateY(-5px); /* Efecto de levitación */
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+}
+
+.mini-games h2 {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #4a90e2; /* Azul calmante para el título */
+    text-align: center;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5); /* Sombra sutil para el título */
+}
+
+.mini-games p {
+    font-size: 1.3rem;
+    color: #e0e0e0; /* Texto claro en lugar de gris oscuro */
+    background: #444444; /* Fondo oscuro para los botones */
+    border: 1px solid #666666; /* Borde más oscuro */
+    border-radius: 10px;
+    padding: 15px;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.2s ease, background-color 0.3s ease, border-color 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.mini-games p:hover {
+    transform: scale(1.05);
+    background-color: #4a90e2; /* Azul brillante al pasar el mouse */
+    border-color: #357abd;
+    color: #fff; /* Cambia el color del texto en hover */
+}
+
+.mini-games p:active {
+    transform: scale(0.98); /* Efecto de compresión en clic */
+    background-color: #357abd; /* Azul oscuro al presionar */
+    border-color: #2f6a8e;
+}
+
+.mini-games p:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(72, 132, 211, 0.5); /* Efecto de enfoque */
+}
+
+.reaction-game-container,
+.point-follow-game-container,
+.find-object-game-container {
+    margin-top: 20px;
+    transition: all 0.3s ease-in-out; /* Añadimos transición suave */
+}

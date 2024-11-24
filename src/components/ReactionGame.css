@@ -1,0 +1,35 @@
+.reaction-game {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    background-color: #fff;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+  }
+  
+  .start-button {
+    padding: 10px 20px;
+    font-size: 1.1rem;
+    background-color: #4a90e2;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+  
+  .start-button:hover {
+    background-color: #357abd;
+  }
+  
+  .start-button:active {
+    transform: scale(0.95);
+  }
+  
+  .reaction-game p {
+    font-size: 1.2rem;
+    color: #555;
+  }
+  
