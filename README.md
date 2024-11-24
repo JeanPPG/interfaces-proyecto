@@ -33,33 +33,36 @@ Sigue estos pasos para configurar y ejecutar el proyecto en tu máquina local:
 ```bash
 git clone https://github.com/tu-usuario/tu-repositorio.git
 cd tu-repositorio
+```
 
 ### 2️⃣ Instala las dependencias
 ```bash
 npm install
+```
+
 ### 3️⃣ Configura el backend
 En la raíz del proyecto, crea el archivo server.js y asegúrate de que contenga el backend descrito.
 
 Instala dependencias adicionales:
 ```bash
 npm install express body-parser cors
-
+```
 Inicia el servidor:
 ```bash
 node server.js
-
+```
 ### 4️⃣ Ejecuta la aplicación React
 En otra terminal:
 ```bash
 npm start
-
+```
 ## 🎮 **Cómo Usar la Aplicación**
 Accede a http://localhost:3000 en tu navegador.
 Activa la cámara y selecciona un minijuego.
 Al desactivar la cámara, los datos de la sesión se guardarán automáticamente en el backend como un archivo JSON.
 
 ## 📂 **Estructura del Proyecto**
-
+```text
 src/
 ├── App.js              # Lógica principal de la aplicación
 ├── App.css             # Estilos globales
@@ -68,7 +71,7 @@ src/
 │   ├── Results.js      # Visualización de resultados
 │   ├── MiniGame1.js    # Minijuego específico
 ├── server.js           # Servidor backend para guardar datos
-
+```
 
 ## 💡 **Tecnologías Utilizadas**
 Frontend: React.js
