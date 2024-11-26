@@ -15,7 +15,7 @@ const ColorSwitchGame = () => {
         setColor(randomColor);
         setButtonEnabled(true); // Activar el botón para hacer clic
       }
-    }, 1000); // Cambio de color cada 1 segundo
+    }, 2000); // Cambio de color cada 1 segundo
 
     return () => clearInterval(interval); // Limpiar intervalo cuando el componente se desmonte
   }, [gameOver]);
