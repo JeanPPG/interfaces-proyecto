@@ -117,18 +117,43 @@ const App = () => {
   const stopGazeRecorderFn = useRef(null);
 
   /**
-   * Maneja los cambios en el estado de la cámara. Inicia o detiene los servicios según sea necesario.
-   */
-  useEffect(() => {
-    if (cameraEnabled) {
-      startMorphcast().then((stop) => setStopMorphcastFn(() => stop));
-      stopGazeRecorderFn.current = startGazeRecorder();
-    } else {
-      if (stopMorphcastFn) stopMorphcast(stopMorphcastFn);
-      if (stopGazeRecorderFn.current) stopGazeRecorderFn.current();
-      if (Object.keys(sessionData).length > 0) saveSessionData(sessionData);
+ * Envía los datos de la sesión al backend.
+ * @param {Object} data - Datos de la sesión.
+ */
+const sendDataToBackend = async (data) => {
+  try {
+    const response = await fetch('http://localhost:5000/analyze', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    const result = await response.json();
+    console.log('Respuesta del servidor:', result);
+  } catch (error) {
+    console.error('Error enviando datos al backend:', error);
+  }
+};
+
+/**
+ * Maneja los cambios en el estado de la cámara.
+ */
+useEffect(() => {
+  if (cameraEnabled) {
+    startMorphcast().then((stop) => setStopMorphcastFn(() => stop));
+    stopGazeRecorderFn.current = startGazeRecorder();
+  } else {
+    if (stopMorphcastFn) stopMorphcast(stopMorphcastFn);
+    if (stopGazeRecorderFn.current) stopGazeRecorderFn.current();
+    if (Object.keys(sessionData).length > 0) {
+      saveSessionData(sessionData);
+      sendDataToBackend(sessionData); // Enviar datos al backend
     }
-  }, [cameraEnabled]);
+  }
+}, [cameraEnabled]);
+
 
   return (
     <div className={`app ${isMiniGameActive ? 'mini-game-active' : ''}`}>
@@ -157,4 +182,3 @@ const App = () => {
 };
 
 export default App;
-
