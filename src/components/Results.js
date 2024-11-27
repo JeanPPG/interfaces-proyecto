@@ -21,15 +21,7 @@ const Results = ({ setCameraEnabled, cameraEnabled }) => {
       {cameraEnabled && (
         <div className="camera-container">
           <p className="camera-status">📷 La cámara está activada.</p>
-          <Webcam
-            audio={false} // Desactivar audio
-            screenshotFormat="image/jpeg" // Formato de captura
-            width="100%" // 100% de ancho de su contenedor
-            videoConstraints={{
-              facingMode: "user", // Modo de la cámara frontal
-            }}
-            className="camera-feed" // Aplicar clase CSS para darle estilo
-          />
+          
         </div>
       )}
     </div>
