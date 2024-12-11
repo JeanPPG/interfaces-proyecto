@@ -18,13 +18,17 @@ const App = () => {
    * @param {Object} data - Datos de la sesión a guardar.
    */
   const saveSessionData = (data) => {
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const anchor = document.createElement('a');
-    anchor.href = url;
-    anchor.download = `session_data_${new Date().toISOString()}.json`;
-    anchor.click();
-    URL.revokeObjectURL(url);
+    // Send session data to App.py
+    fetch('http://localhost:5000/save_session_data', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    })
+    .then(response => response.json())
+    .then(data => console.log('Success:', data))
+    .catch((error) => console.error('Error:', error));
   };
 
   /**

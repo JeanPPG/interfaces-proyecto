@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import Webcam from "react-webcam";  // Importamos la librería
 
 import "./Results.css";
-import cv from "opencv.js";
 
 const Results = ({ setCameraEnabled, cameraEnabled }) => {
 
