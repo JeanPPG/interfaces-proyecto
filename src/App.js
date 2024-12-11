@@ -6,84 +6,16 @@ import './App.css';
 /* global GazeRecorderAPI */
 
 const App = () => {
+  // Estado para habilitar/deshabilitar la cámara
   const [cameraEnabled, setCameraEnabled] = useState(false);
+  // Estado para controlar si el minijuego está activo
   const [isMiniGameActive, setIsMiniGameActive] = useState(false);
+  // Estado para almacenar datos de sesión (como datos de Morphcast y GazeRecorder)
   const [sessionData, setSessionData] = useState({});
-  const [faceDetected, setFaceDetected] = useState(false); // Estado para la detección de rostro
-  const videoRef = useRef(null); // Referencia para el video
-  const canvasRef = useRef(null); // Referencia para el canvas
-  const [stopMorphcastFn, setStopMorphcastFn] = useState(null);
-  const stopGazeRecorderFn = useRef(null);
-
-  // Cargar y configurar OpenCV.js
-  useEffect(() => {
-    if (window.cv) {
-      const videoElement = videoRef.current;
-      const canvasElement = canvasRef.current;
-      const context = canvasElement.getContext('2d');
-      
-      // Cargar el clasificador Haar Cascade para la detección de rostros
-      const faceCascade = new window.cv.CascadeClassifier();
-      faceCascade.load('haarcascade_frontalface_default.xml');
-
-      // Función de detección de rostros
-      const detectFace = () => {
-        if (videoElement && context) {
-          context.drawImage(videoElement, 0, 0, canvasElement.width, canvasElement.height);
-          const frame = context.getImageData(0, 0, canvasElement.width, canvasElement.height);
-          const mat = window.cv.matFromImageData(frame);
-          const grayMat = new window.cv.Mat();
-          window.cv.cvtColor(mat, grayMat, window.cv.COLOR_RGBA2GRAY);
-
-          const faces = new window.cv.RectVector();
-          faceCascade.detectMultiScale(grayMat, faces);
-
-          if (faces.size() > 0) {
-            setFaceDetected(true);
-          } else {
-            setFaceDetected(false);
-          }
-
-          mat.delete();
-          grayMat.delete();
-          faces.delete();
-        }
-      };
-
-      // Iniciar la detección de rostros cada 100ms para optimización de recursos
-      const intervalId = setInterval(detectFace, 100);
-
-      // Limpiar el intervalo cuando el componente se desmonte
-      return () => {
-        clearInterval(intervalId);
-      };
-    }
-  }, []);
-
-  // Manejo de la cámara
-  useEffect(() => {
-    if (cameraEnabled) {
-      const initCamera = async () => {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: 'user' },
-        });
-        videoRef.current.srcObject = stream;
-        videoRef.current.play();
-      };
-
-      initCamera();
-
-      return () => {
-        const stream = videoRef.current.srcObject;
-        const tracks = stream.getTracks();
-        tracks.forEach((track) => track.stop());
-      };
-    }
-  }, [cameraEnabled]);
 
   /**
-   * Guardar los datos de sesión en un archivo JSON descargable
-   * @param {Object} data
+   * Guarda los datos de sesión en un archivo JSON descargable.
+   * @param {Object} data - Datos de la sesión a guardar.
    */
   const saveSessionData = (data) => {
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -96,29 +28,8 @@ const App = () => {
   };
 
   /**
-   * Enviar datos al backend
-   * @param {Object} data
-   */
-  const sendDataToBackend = async (data) => {
-    try {
-      const response = await fetch('http://localhost:5000/upload', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
-      if (response.ok) {
-        console.log('Datos enviados correctamente al backend.');
-      } else {
-        console.error('Error al enviar datos al backend.');
-      }
-    } catch (error) {
-      console.error('Error en la conexión con el backend:', error);
-    }
-  };
-
-  /**
-   * Iniciar el servicio de Morphcast
-   * @returns {Function}
+   * Inicia el servicio de Morphcast cargando los módulos necesarios.
+   * @returns {Function} - Función para detener Morphcast.
    */
   const startMorphcast = async () => {
     const scriptLoader = (src, config = null) =>
@@ -131,28 +42,30 @@ const App = () => {
         document.head.appendChild(script);
       });
 
+    // Carga los scripts necesarios para Morphcast
     await scriptLoader('https://sdk.morphcast.com/mphtools/v1.1/mphtools.js', 'compatibilityUI, compatibilityAutoCheck');
     await scriptLoader('https://ai-sdk.morphcast.com/v1.16/ai-sdk.js');
 
     const CY = window.CY;
     const loader = CY.loader();
 
+    // Configura los módulos de Morphcast
     loader
-      .licenseKey('sk52c05b0d7a4c86845903a5f3e556f024c07299241fd3')
-      .addModule(CY.modules().FACE_EMOTION.name, { smoothness: 0.4 })
-      .addModule(CY.modules().FACE_ATTENTION.name, { smoothness: 0.83 })
-      .addModule(CY.modules().DATA_AGGREGATOR.name, { initialWaitMs: 2000, periodMs: 1000 });
+      .licenseKey('sk52c05b0d7a4c86845903a5f3e556f024c07299241fd3') // Clave de licencia
+      .addModule(CY.modules().FACE_EMOTION.name, { smoothness: 0.4 }) // Modulo de emociones
+      .addModule(CY.modules().FACE_ATTENTION.name, { smoothness: 0.83 }) // Modulo de atención
+      .addModule(CY.modules().DATA_AGGREGATOR.name, { initialWaitMs: 2000, periodMs: 1000 }); // Agregador de datos
 
     const { start, stop } = await loader.load();
-    start();
+    start(); // Inicia Morphcast
     window.addEventListener(CY.modules().DATA_AGGREGATOR.eventName, handleMorphcastData);
 
-    return stop;
+    return stop; // Devuelve la función para detener Morphcast
   };
 
   /**
-   * Detener Morphcast
-   * @param {Function} stop
+   * Detiene el servicio de Morphcast y elimina los eventos asociados.
+   * @param {Function} stop - Función para detener Morphcast.
    */
   const stopMorphcast = (stop) => {
     if (stop) {
@@ -162,8 +75,8 @@ const App = () => {
   };
 
   /**
-   * Manejar los datos de Morphcast
-   * @param {Object} e
+   * Maneja los datos recibidos de Morphcast.
+   * @param {Object} e - Evento con datos de Morphcast.
    */
   const handleMorphcastData = (e) => {
     setSessionData((prevData) => ({
@@ -173,8 +86,8 @@ const App = () => {
   };
 
   /**
-   * Iniciar GazeRecorder
-   * @returns {Function}
+   * Inicia el servicio de GazeRecorder para grabar datos de seguimiento ocular.
+   * @returns {Function} - Función para detener GazeRecorder y obtener los datos.
    */
   const startGazeRecorder = () => {
     const script = document.createElement('script');
@@ -183,14 +96,14 @@ const App = () => {
     document.body.appendChild(script);
 
     script.onload = () => {
-      GazeRecorderAPI.Rec();
+      GazeRecorderAPI.Rec(); // Inicia la grabación
     };
 
     script.onerror = () => console.error('Failed to load GazeRecorder script');
 
     return () => {
-      GazeRecorderAPI.StopRec();
-      const gazeData = GazeRecorderAPI.GetRecData();
+      GazeRecorderAPI.StopRec(); // Detiene la grabación
+      const gazeData = GazeRecorderAPI.GetRecData(); // Obtiene los datos grabados
       setSessionData((prevData) => ({
         ...prevData,
         gazeRecorder: gazeData,
@@ -198,6 +111,14 @@ const App = () => {
     };
   };
 
+  // Guarda la función para detener Morphcast
+  const [stopMorphcastFn, setStopMorphcastFn] = useState(null);
+  // Ref para almacenar la función de detener GazeRecorder
+  const stopGazeRecorderFn = useRef(null);
+
+  /**
+   * Maneja los cambios en el estado de la cámara. Inicia o detiene los servicios según sea necesario.
+   */
   useEffect(() => {
     if (cameraEnabled) {
       startMorphcast().then((stop) => setStopMorphcastFn(() => stop));
@@ -205,40 +126,35 @@ const App = () => {
     } else {
       if (stopMorphcastFn) stopMorphcast(stopMorphcastFn);
       if (stopGazeRecorderFn.current) stopGazeRecorderFn.current();
-      if (Object.keys(sessionData).length > 0) {
-        saveSessionData(sessionData);
-        sendDataToBackend(sessionData);
-      }
+      if (Object.keys(sessionData).length > 0) saveSessionData(sessionData);
     }
   }, [cameraEnabled]);
 
   return (
     <div className={`app ${isMiniGameActive ? 'mini-game-active' : ''}`}>
+      {/* Columna izquierda: Mostrar resultados si no hay un minijuego activo */}
       {!isMiniGameActive && (
         <div className="left-column">
           <Results setCameraEnabled={setCameraEnabled} cameraEnabled={cameraEnabled} />
         </div>
       )}
 
+      {/* Columna derecha: Mostrar minijuegos cuando la cámara está activa */}
       {cameraEnabled && !isMiniGameActive && (
         <div className="right-column">
           <MiniJuegos onGameStart={() => setIsMiniGameActive(true)} />
         </div>
       )}
 
+      {/* Contenedor del minijuego */}
       {isMiniGameActive && (
         <div className="mini-game-container">
           <MiniJuegos onGameEnd={() => setIsMiniGameActive(false)} />
         </div>
       )}
-
-      <div className="video-container">
-        <video ref={videoRef} width="640" height="480" autoPlay />
-        <canvas ref={canvasRef} width="640" height="480" style={{ display: 'none' }} />
-        <p>{faceDetected ? 'Rostro Detectado' : 'No se detecta rostro'}</p>
-      </div>
     </div>
   );
 };
 
 export default App;
+

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Webcam from "react-webcam";  // Importamos la librería
 
 import "./Results.css";
+import cv from "opencv.js";
 
 const Results = ({ setCameraEnabled, cameraEnabled }) => {
 
@@ -9,6 +10,7 @@ const Results = ({ setCameraEnabled, cameraEnabled }) => {
     setCameraEnabled((prev) => !prev); // Cambia el estado de activación de la cámara
   };
 
+  
   return (
     <div className="results">
       <h2>HERRAMIENTA DE ANÁLISIS DE ATENCIÓN</h2>
@@ -21,7 +23,15 @@ const Results = ({ setCameraEnabled, cameraEnabled }) => {
       {cameraEnabled && (
         <div className="camera-container">
           <p className="camera-status">📷 La cámara está activada.</p>
-          
+          <Webcam
+            audio={false} // Desactivar audio
+            screenshotFormat="image/jpeg" // Formato de captura
+            width="100%" // 100% de ancho de su contenedor
+            videoConstraints={{
+              facingMode: "user", // Modo de la cámara frontal
+            }}
+            className="camera-feed" // Aplicar clase CSS para darle estilo
+          />
         </div>
       )}
     </div>
