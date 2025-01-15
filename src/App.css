@@ -7,8 +7,8 @@
 
 body {
   font-family: 'Poppins', Arial, sans-serif;
-  background: linear-gradient(135deg, #1c1c1c, #2a2a2a); /* Fondo oscuro con un toque de gradiente */
-  color: #e0e0e0; /* Texto claro */
+  background: linear-gradient(135deg, #1c1c1c, #2a2a2a);
+  color: #e0e0e0;
   overflow-x: hidden;
 }
 
@@ -19,11 +19,6 @@ body {
   padding: 20px;
   align-items: stretch;
   justify-content: center;
-}
-
-.app {
-  display: flex;
-  flex-direction: row;
   transition: all 0.3s ease;
 }
 
@@ -61,43 +56,36 @@ body {
   background-color: rgba(255, 255, 255, 0.9);
 }
 
-.left-column, .right-column {
-  width: 50%;
+.results {
+  width: 100%;
+  height: 100vh;
+  transition: all 0.3s ease;
+}
+
+.results.camera-active {
+  width: 25%;
+  height: auto;
 }
 
 .left-column {
-  padding: 20px;
-}
-
-.right-column {
-  padding: 20px;
-}
-
-
-
-/* Header */
-.App-header {
-  background-color: #121212; /* Fondo oscuro para el header */
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: #fff;
-  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
-}
-
-/* Left and Right Columns */
-.left-column, 
-.right-column {
-  flex: 1;
-  background: #2a2a2a; /* Fondo oscuro para las columnas */
+  width: 25%;
+  height: 100%;
+  background: #2a2a2a;
   border-radius: 15px;
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
   padding: 30px;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
+
+.right-column {
+  width: 75%;
+  background: #2a2a2a;
+  border-radius: 15px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
 
 .left-column:hover, 
 .right-column:hover {
@@ -106,18 +94,18 @@ body {
 }
 
 .left-column:hover {
-  background: linear-gradient(135deg, #333333, #4a4a4a); /* Gradiente sutil */
+  background: linear-gradient(135deg, #333333, #4a4a4a);
 }
 
 .right-column:hover {
-  background: linear-gradient(135deg, #4f4f4f, #5a5a5a); /* Gradiente sutil */
+  background: linear-gradient(135deg, #4f4f4f, #5a5a5a);
 }
 
 /* Typography */
 h2 {
   font-size: 2rem;
   font-weight: 600;
-  color: #4a90e2; /* Color azul brillante */
+  color: #4a90e2;
   margin-bottom: 20px;
   text-align: center;
   text-transform: uppercase;
@@ -128,7 +116,7 @@ p {
   font-size: 1.1rem;
   line-height: 1.5;
   margin: 10px 0;
-  color: #bbb; /* Texto gris claro */
+  color: #bbb;
   text-align: center;
 }
 
@@ -139,7 +127,7 @@ button {
   font-weight: bold;
   border: none;
   border-radius: 25px;
-  background: #4a90e2; /* Azul brillante */
+  background: #4a90e2;
   color: #fff;
   cursor: pointer;
   transition: background-color 0.3s ease, transform 0.2s ease;
@@ -155,24 +143,4 @@ button:hover {
 button:active {
   transform: scale(0.95);
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-
-
-/* Responsive Design */
-@media (max-width: 768px) {
-  .app {
-    flex-direction: column;
-    gap: 30px;
-  }
-
-  .left-column, 
-  .right-column {
-    width: 100%;
-  }
-
-  .camera-container {
-    width: 100%;
-    padding: 10px;
-  }
 }

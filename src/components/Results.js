@@ -4,17 +4,29 @@ import Webcam from "react-webcam";  // Importamos la librería
 import "./Results.css";
 
 const Results = ({ setCameraEnabled, cameraEnabled }) => {
+  const [resultsEnabled, setResultsEnabled] = useState(false);
+  const [timer, setTimer] = useState(null);
 
   const toggleCamera = () => {
-    setCameraEnabled((prev) => !prev); // Cambia el estado de activación de la cámara
+    setCameraEnabled((prev) => !prev);
+    if (!cameraEnabled) {
+      const newTimer = setTimeout(() => {
+        setResultsEnabled(true);
+      }, 10000); // 10 segundos
+      setTimer(newTimer);
+    } else {
+      clearTimeout(timer);
+      setResultsEnabled(false);
+    }
   };
 
-  
   return (
     <div className="results">
       <h2>HERRAMIENTA DE ANÁLISIS DE ATENCIÓN</h2>
       <p>🎮 Para acceder a los mini juegos, primero debes activar la cámara.</p> {/* Enunciado informativo */}
-      <p>📊 Visualiza los resultados de tus actividades aquí.</p>
+      <button disabled={!resultsEnabled}>
+        Visualizar Resultados
+      </button>
       <button onClick={toggleCamera}>
         {cameraEnabled ? "Desactivar Cámara" : "Activar Cámara"}
       </button>
@@ -33,6 +45,8 @@ const Results = ({ setCameraEnabled, cameraEnabled }) => {
           />
         </div>
       )}
+
+      
     </div>
   );
 };

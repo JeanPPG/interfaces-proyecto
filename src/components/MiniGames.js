@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import "./MiniGames.css";
 import ReactionGame from "./ReactionGame"; // Importamos el juego de reacción
+import PointFollowGame from "./PointFollowGame"; // Importamos el juego "Seguir el punto"
+import FindObjectGame from "./FindObjectGame"; // Importamos el juego "Buscar el objeto"
+import FindObject from "./FindObjectGame";
 
 const MiniGames = ({ onGameStart, onGameEnd }) => {
   const [showReactionGame, setShowReactionGame] = useState(false); // Estado para mostrar/ocultar el juego de reacción
@@ -27,18 +30,16 @@ const MiniGames = ({ onGameStart, onGameEnd }) => {
       {/* Botón para "Seguir el punto" */}
       <p onClick={togglePointFollowGame}>➡️ Seguir el punto</p>
       {showPointFollowGame && (
-        <div className="point-follow-game-container">
-          {/* Aquí iría el componente de "Seguir el punto" cuando esté listo */}
-          <p>Placeholder: Seguir el punto</p>
-        </div>
+        <div className="follow-game-container">
+        <PointFollowGame />
+      </div>
       )}
       
       {/* Botón para "Buscar el objeto" */}
       <p onClick={toggleFindObjectGame}>🔍 Buscar el objeto</p>
       {showFindObjectGame && (
         <div className="find-object-game-container">
-          {/* Aquí iría el componente de "Buscar el objeto" cuando esté listo */}
-          <p>Placeholder: Buscar el objeto</p>
+          <FindObjectGame />
         </div>
       )}
 

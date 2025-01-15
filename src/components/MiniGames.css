@@ -55,7 +55,17 @@
     outline: none;
     box-shadow: 0 0 0 3px rgba(72, 132, 211, 0.5); /* Efecto de enfoque */
 }
-
+.follow-game-container {
+    width: 80%;
+    height: 500px; /* Altura del recuadro */
+    margin: 0 auto; /* Centrar el recuadro horizontalmente */
+    background-color: #222; /* Fondo oscuro */
+    border: 2px solid #4a90e2; /* Borde azul */
+    border-radius: 15px;
+    position: relative; /* Necesario para posicionar elementos dentro del recuadro */
+    overflow: hidden; /* Ocultar cualquier contenido que se desborde */
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+}
 .reaction-game-container,
 .point-follow-game-container,
 .find-object-game-container {

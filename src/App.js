@@ -136,21 +136,16 @@ const App = () => {
 
   return (
     <div className={`app ${isMiniGameActive ? 'mini-game-active' : ''}`}>
-      {/* Columna izquierda: Mostrar resultados si no hay un minijuego activo */}
       {!isMiniGameActive && (
-        <div className="left-column">
+        <div className={`results ${cameraEnabled ? 'camera-active' : ''}`}>
           <Results setCameraEnabled={setCameraEnabled} cameraEnabled={cameraEnabled} />
         </div>
       )}
-
-      {/* Columna derecha: Mostrar minijuegos cuando la cámara está activa */}
       {cameraEnabled && !isMiniGameActive && (
         <div className="right-column">
           <MiniJuegos onGameStart={() => setIsMiniGameActive(true)} />
         </div>
       )}
-
-      {/* Contenedor del minijuego */}
       {isMiniGameActive && (
         <div className="mini-game-container">
           <MiniJuegos onGameEnd={() => setIsMiniGameActive(false)} />
