@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import './ReactionGame.css';
 
 const ColorSwitchGame = () => {
@@ -48,9 +49,11 @@ const ColorSwitchGame = () => {
         </div>
       ) : (
         <div className="gameContainer">
-          <div
+          <motion.div
             className="circle"
             style={{ backgroundColor: color }}
+            animate={{ scale: [1, 1.2, 1] }} // Animación de escala
+            transition={{ duration: 0.5, repeat: Infinity, repeatType: "loop" }}
           />
           <p className="instructions">Haz clic en el color que aparece en el círculo.</p>
           {buttonEnabled && (
@@ -67,7 +70,5 @@ const ColorSwitchGame = () => {
     </div>
   );
 };
-
-
 
 export default ColorSwitchGame;

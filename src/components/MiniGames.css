@@ -1,8 +1,8 @@
 .mini-games {
     display: flex;
     flex-direction: column;
-    gap: 20px; /* Espaciado entre los juegos */
-    background: linear-gradient(135deg, #2a2a2a, #333333); /* Fondo oscuro con gradiente suave */
+    gap: 20px;
+    background: linear-gradient(135deg, #2a2a2a, #333333);
     border-radius: 15px;
     padding: 20px;
     box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
@@ -10,26 +10,26 @@
 }
 
 .mini-games:hover {
-    transform: translateY(-5px); /* Efecto de levitación */
+    transform: translateY(-5px);
     box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
 }
 
 .mini-games h2 {
     font-size: 2rem;
     font-weight: 600;
-    color: #4a90e2; /* Azul calmante para el título */
+    color: #4a90e2;
     text-align: center;
     margin-bottom: 15px;
     text-transform: uppercase;
     letter-spacing: 1px;
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5); /* Sombra sutil para el título */
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
 }
 
 .mini-games p {
     font-size: 1.3rem;
-    color: #e0e0e0; /* Texto claro en lugar de gris oscuro */
-    background: #444444; /* Fondo oscuro para los botones */
-    border: 1px solid #666666; /* Borde más oscuro */
+    color: #e0e0e0;
+    background: #444444;
+    border: 1px solid #666666;
     border-radius: 10px;
     padding: 15px;
     text-align: center;
@@ -40,35 +40,45 @@
 
 .mini-games p:hover {
     transform: scale(1.05);
-    background-color: #4a90e2; /* Azul brillante al pasar el mouse */
+    background-color: #4a90e2;
     border-color: #357abd;
-    color: #fff; /* Cambia el color del texto en hover */
+    color: #fff;
 }
 
 .mini-games p:active {
-    transform: scale(0.98); /* Efecto de compresión en clic */
-    background-color: #357abd; /* Azul oscuro al presionar */
+    transform: scale(0.98);
+    background-color: #357abd;
     border-color: #2f6a8e;
 }
 
 .mini-games p:focus {
     outline: none;
-    box-shadow: 0 0 0 3px rgba(72, 132, 211, 0.5); /* Efecto de enfoque */
+    box-shadow: 0 0 0 3px rgba(72, 132, 211, 0.5);
 }
-.follow-game-container {
-    width: 80%;
-    height: 500px; /* Altura del recuadro */
-    margin: 0 auto; /* Centrar el recuadro horizontalmente */
-    background-color: #222; /* Fondo oscuro */
-    border: 2px solid #4a90e2; /* Borde azul */
-    border-radius: 15px;
-    position: relative; /* Necesario para posicionar elementos dentro del recuadro */
-    overflow: hidden; /* Ocultar cualquier contenido que se desborde */
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
-}
+
+.follow-game-container,
 .reaction-game-container,
-.point-follow-game-container,
 .find-object-game-container {
-    margin-top: 20px;
-    transition: all 0.3s ease-in-out; /* Añadimos transición suave */
+    width: 80%;
+    height: 650px;
+    margin: 0 auto;
+    background-color: #222;
+    border: 2px solid #4a90e2;
+    border-radius: 15px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.follow-game-container,
+.reaction-game-container,
+.find-object-game-container {
+    opacity: 0;
+    transform: scale(0.95);
+}
+
+.mini-games div:has(> *) {
+    opacity: 1;
+    transform: scale(1);
 }

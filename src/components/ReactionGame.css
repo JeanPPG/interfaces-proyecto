@@ -1,108 +1,118 @@
 .reaction-game {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
-    background-color: #fff;
-    border-radius: 15px;
-    padding: 20px;
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
-  }
-  
-  .start-button {
-    padding: 10px 20px;
-    font-size: 1.1rem;
-    background-color: #4a90e2;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-  }
-  
-  .start-button:hover {
-    background-color: #357abd;
-  }
-  
-  .start-button:active {
-    transform: scale(0.95);
-  }
-  
-  .reaction-game p {
-    font-size: 1.2rem;
-    color: #555;
-  }
-  
-  .container {
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    background-color: #222222; /* Fondo oscuro */
-    color: #e0e0e0;
-    margin: 0;
-  }
-  .title {
-    font-size: 2.5rem;
-    font-weight: 600;
-    color: #ff6f61;
-    text-align: center;
-    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
-  }
-  .gameOverText {
-    font-size: 1.8rem;
-    color: #ff6f61;
-    text-align: center;
-  }
-  .restartButton {
-    font-size: 1.5rem;
-    padding: 10px 20px;
-    background-color: #ff6f61;
-    border: none;
-    color: white;
-    border-radius: 8px;
-    cursor: pointer;
-    margin-top: 20px;
-  }
-  .gameContainer {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  .circle {
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    margin-bottom: 20px;
-    transition: background-color 1s ease-in-out;
-  }
-  .instructions {
-    font-size: 1.2rem;
-    color: #e0e0e0;
-    text-align: center;
-    margin-bottom: 20px;
-  }
-  .colorButtons {
-    display: flex;
-    gap: 20px;
-    margin-bottom: 20px;
-  }
-  .colorButton {
-    font-size: 1.5rem;
-    padding: 10px 20px;
-    background-color: #444444;
-    border: none;
-    color: #e0e0e0;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-  }
-  .colorButton:hover {
-    background-color: #ff6f61;
-  }
-  .score {
-    font-size: 1.5rem;
-    color: #e0e0e0;
-    margin-top: 20px;
-  }
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  background-color: #fff;
+  border-radius: 15px;
+  padding: 20px;
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+}
+
+.start-button {
+  padding: 10px 20px;
+  font-size: 1.1rem;
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.start-button:hover {
+  background-color: #357abd;
+}
+
+.start-button:active {
+  transform: scale(0.95);
+}
+
+.reaction-game p {
+  font-size: 1.2rem;
+  color: #555;
+}
+
+.container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: #222222; /* Fondo oscuro */
+  color: #e0e0e0;
+  margin: 0;
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 600;
+  color: #ff6f61;
+  text-align: center;
+  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+.gameOverText {
+  font-size: 1.8rem;
+  color: #ff6f61;
+  text-align: center;
+}
+
+.restartButton {
+  font-size: 1.5rem;
+  padding: 10px 20px;
+  background-color: #ff6f61;
+  border: none;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 20px;
+}
+
+.gameContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.circle {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  margin-bottom: 20px;
+  transition: background-color 1s ease-in-out;
+}
+
+.instructions {
+  font-size: 1.2rem;
+  color: #e0e0e0;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.colorButtons {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.colorButton {
+  font-size: 1.5rem;
+  padding: 10px 20px;
+  background-color: #444444;
+  border: none;
+  color: #e0e0e0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.colorButton:hover {
+  background-color: #ff6f61;
+}
+
+.score {
+  font-size: 1.5rem;
+  color: #e0e0e0;
+  margin-top: 20px;
+}

@@ -1,4 +1,6 @@
+// Importar Framer Motion
 import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import './FindObjectGame.css';
 
 const EMOJIS = ['🍎', '🍌', '🍇', '🍊', '🍐', '🍉', '🍓', '🥝', '🍒', '🥭', '🍍', '🥥'];
@@ -14,28 +16,20 @@ const FindObject = () => {
 
     const generarObjetos = () => {
         const numObjetos = Math.min(nivel * 5, 20);
-        const objetosDisponibles = [...EMOJIS];
         const nuevosObjetos = [];
-        
+
         // Seleccionar objeto objetivo
-        const indiceObjetivo = Math.floor(Math.random() * objetosDisponibles.length);
-        const objetivo = objetosDisponibles[indiceObjetivo];
+        const objetivo = EMOJIS[Math.floor(Math.random() * EMOJIS.length)];
         setObjetoObjetivo(objetivo);
-        objetosDisponibles.splice(indiceObjetivo, 1);
+
+        // Generar objetos aleatorios
+        for (let i = 0; i < numObjetos; i++) {
+            nuevosObjetos.push(EMOJIS[Math.floor(Math.random() * EMOJIS.length)]);
+        }
 
         // Añadir el objeto objetivo en una posición aleatoria
         const posicionObjetivo = Math.floor(Math.random() * numObjetos);
-        
-        // Llenar el array de objetos
-        for (let i = 0; i < numObjetos; i++) {
-            if (i === posicionObjetivo) {
-                nuevosObjetos.push(objetivo);
-            } else {
-                const indiceAleatorio = Math.floor(Math.random() * objetosDisponibles.length);
-                nuevosObjetos.push(objetosDisponibles[indiceAleatorio]);
-                objetosDisponibles.splice(indiceAleatorio, 1);
-            }
-        }
+        nuevosObjetos[posicionObjetivo] = objetivo;
 
         setObjetos(nuevosObjetos);
     };
@@ -87,25 +81,29 @@ const FindObject = () => {
                         </div>
                         <div className="objects-container">
                             {objetos.map((objeto, index) => (
-                                <div
+                                <motion.div
                                     key={index}
                                     className="object"
+                                    whileHover={{ scale: 1.1 }}
                                     onClick={() => manejarClick(objeto)}
                                 >
                                     {objeto}
-                                </div>
+                                </motion.div>
                             ))}
                         </div>
                         <div className="level-indicator">Nivel {nivel}</div>
                     </>
                 ) : tiempo === 0 ? (
-                    <div className="game-over">
-                        <div>¡Juego Terminado!</div>
+                    <motion.div 
+                        className="game-over"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                    >
                         <div>Puntuación Final: {puntuacion}</div>
                         <button className="start-button" onClick={iniciarJuego}>
                             Jugar de Nuevo
                         </button>
-                    </div>
+                    </motion.div>
                 ) : (
                     <button className="start-button" onClick={iniciarJuego}>
                         Iniciar Juego

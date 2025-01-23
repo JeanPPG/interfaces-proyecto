@@ -2,7 +2,8 @@ body {
     margin: 0;
     padding: 0;
     font-family: 'Arial', sans-serif;
-    background-color: #f0f0f0;
+    background-color: #121212; /* Fondo oscuro para toda la página */
+    color: #e0e0e0; /* Texto claro para contraste */
 }
 
 #game-container {
@@ -10,48 +11,49 @@ body {
     justify-content: center;
     align-items: center;
     height: 100vh;
-    background-color: #282c34;
+    background-color: #121212; /* Fondo oscuro */
 }
 
 #game-board {
     position: relative;
     width: 600px;
     height: 600px;
-    background-color: #ffffff;
-    border: 2px solid #000000;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    background-color: #1e1e1e; /* Fondo del tablero más claro que el fondo general */
+    border: 2px solid #333333; /* Borde tenue */
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.7); /* Sombra suave */
     border-radius: 10px;
+    overflow: hidden;
 }
 
 .point {
     position: absolute;
     width: 20px;
     height: 20px;
-    background-color: #ff0000;
+    background-color: #ff5722; /* Rojo cálido para el punto */
     border-radius: 50%;
     cursor: pointer;
-    transition: transform 0.2s ease;
     transform: translate(-50%, -50%);
+    transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
 .point:hover {
+    background-color: #ff7043; /* Rojo más claro al pasar el mouse */
     transform: translate(-50%, -50%) scale(1.2);
 }
 
-.score-board {
+.score-board, .timer {
     position: absolute;
     top: 10px;
+    font-size: 20px;
+    color: #e0e0e0; /* Texto claro */
+}
+
+.score-board {
     left: 10px;
-    font-size: 24px;
-    color: #000000;
 }
 
 .timer {
-    position: absolute;
-    top: 10px;
     right: 10px;
-    font-size: 24px;
-    color: #000000;
 }
 
 .start-button {
@@ -61,14 +63,19 @@ body {
     transform: translate(-50%, -50%);
     padding: 10px 20px;
     font-size: 18px;
-    background-color: #4CAF50;
-    color: white;
+    background-color: #4caf50; /* Verde oscuro */
+    color: #ffffff; /* Texto blanco */
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 .start-button:hover {
-    background-color: #45a049;
+    background-color: #66bb6a; /* Verde más claro */
+}
+
+.start-button:focus {
+    outline: none;
+    box-shadow: 0 0 10px #66bb6a; /* Brillo al enfocar */
 }
