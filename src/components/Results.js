@@ -3,7 +3,7 @@ import Webcam from "react-webcam";  // Importamos la librería
 
 import "./Results.css";
 
-const Results = ({ setCameraEnabled, cameraEnabled }) => {
+const Results = ({ setCameraEnabled, cameraEnabled, startTest }) => {
   const [resultsEnabled, setResultsEnabled] = useState(false);
   const [timer, setTimer] = useState(null);
 
@@ -30,6 +30,9 @@ const Results = ({ setCameraEnabled, cameraEnabled }) => {
       <button onClick={toggleCamera}>
         {cameraEnabled ? "Desactivar Cámara" : "Activar Cámara"}
       </button>
+      <button onClick={startTest}>
+        Iniciar Test
+      </button>
       
       {cameraEnabled && (
         <div className="camera-container">
@@ -45,10 +48,9 @@ const Results = ({ setCameraEnabled, cameraEnabled }) => {
           />
         </div>
       )}
-
-      
     </div>
   );
 };
+
 
 export default Results;

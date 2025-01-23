@@ -1,6 +1,6 @@
 # 📸 **Aplicación de Evaluación de Atención con Reconocimiento Facial**  
 
-Bienvenido a este proyecto de **evaluación del nivel de atención de estudiantes universitarios** usando tecnologías avanzadas como **Morphcast**, **GazeRecorder**, y **OpenCV**. Esta aplicación analiza emociones y patrones de atención mediante la cámara, almacenando los datos para análisis posterior.  
+Bienvenido a este proyecto de **evaluación del nivel de atención de estudiantes universitarios** usando tecnologías avanzadas como **Morphcast**, **GazeRecorder**. Esta aplicación analiza emociones y patrones de atención mediante la cámara, almacenando los datos para análisis posterior.  
 
 ---
 
@@ -10,8 +10,7 @@ Bienvenido a este proyecto de **evaluación del nivel de atención de estudiante
 - 📊 **APIs integradas** para reconocimiento facial y rastreo ocular:  
   - **Morphcast** para emociones y atención.  
   - **GazeRecorder** para análisis de mirada.  
-- 💾 **Backend** con **Node.js** y **Express** para almacenar datos de sesión.  
-- 🔍 Datos listos para análisis con **OpenCV** y el modelo Haar Cascade en Python.  
+- 💾 **Backend** con **Node.js** y **Flash** para almacenar datos de sesión.  
 
 ---
 
@@ -40,18 +39,7 @@ cd tu-repositorio
 npm install
 ```
 
-### 3️⃣ Configura el backend
-En la raíz del proyecto, crea el archivo server.js y asegúrate de que contenga el backend descrito.
-
-Instala dependencias adicionales:
-```bash
-npm install express body-parser cors
-```
-Inicia el servidor:
-```bash
-node server.js
-```
-### 4️⃣ Ejecuta la aplicación React
+### 3️⃣ Ejecuta la aplicación React
 En otra terminal:
 ```bash
 npm start
@@ -67,22 +55,24 @@ src/
 ├── App.js              # Lógica principal de la aplicación
 ├── App.css             # Estilos globales
 ├── components/
-│   ├── MiniGames.js    # Minijuegos interactivos
-│   ├── Results.js      # Visualización de resultados
-│   ├── MiniGame1.js    # Minijuego específico
-├── server.js           # Servidor backend para guardar datos
+│   ├── MiniGames.js          # Minijuegos interactivos
+│   ├── Results.js            # Visualización de resultados
+│   ├── PointFollowGame.js    # Minijuego específico
+│   ├── ReactionGame.js       # Minijuego específico
+│   ├── FindObjectGame.js     # Minijuego específico
+├── App.py           # Servidor backend para guardar datos
 ```
 
 ## 💡 **Tecnologías Utilizadas**
 Frontend: React.js
-Backend: Node.js, Express
+Backend: Node.js
 APIs: Morphcast, GazeRecorder
-Análisis de datos: Python, OpenCV
+Análisis de datos: Python
 
 ## 📊 **Flujo de Trabajo**
 Captura de Datos: Morphcast y GazeRecorder recopilan datos de emociones y mirada.
 Almacenamiento: Los datos se guardan automáticamente como archivos JSON en el servidor.
-Análisis: Los datos JSON son compatibles con OpenCV para análisis avanzado en Python.
+Análisis: Los datos JSON son compatibles para análisis avanzado en Python.
 
 ## 🧪 **Pruebas y Depuración**
 Verifica que el servidor esté activo en http://localhost:5000.

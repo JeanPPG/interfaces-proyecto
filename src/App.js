@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import MiniJuegos from './components/MiniGames';
 import Results from './components/Results';
 import PantallaBienvenida from './components/PantallaBienvenida';
+import D2RTest from './components/D2RTest';
 import './App.css';
 
 /* global GazeRecorderAPI */
@@ -14,6 +15,8 @@ const App = () => {
   const [isMiniGameActive, setIsMiniGameActive] = useState(false);
   // Estado para almacenar datos de sesión (como datos de Morphcast y GazeRecorder)
   const [sessionData, setSessionData] = useState({});
+  // Estado para controlar si el test de D2R está activo
+  const [startTest, setTestActive] = useState(false);
 
   /**
    * Guarda los datos de sesión en un archivo JSON descargable.
@@ -136,18 +139,28 @@ const App = () => {
     }
   }, [cameraEnabled]);
 
+  const handleStartTest = () => {
+    setTestActive(true); // Activa el test
+  };
+
   if (mostrarBienvenida) {
     return <PantallaBienvenida onFinish={() => setMostrarBienvenida(false)} />;
   }
 
   return (
     <div className={`app ${isMiniGameActive ? 'mini-game-active' : ''}`}>
-      {!isMiniGameActive && (
+      {!isMiniGameActive && !startTest && (
         <div className={`results ${cameraEnabled ? 'camera-active' : ''}`}>
-          <Results setCameraEnabled={setCameraEnabled} cameraEnabled={cameraEnabled} />
+          <Results setCameraEnabled={setCameraEnabled} cameraEnabled={cameraEnabled} startTest={handleStartTest} />
         </div>
       )}
-      {cameraEnabled && !isMiniGameActive && (
+      {startTest && (
+        
+        <div className="mini-game-container">
+          <D2RTest endTest={() => setTestActive(false)}/> {/* Muestra el componente D2RTest cuando el test está activo */}
+        </div>
+      )}
+      {cameraEnabled && !isMiniGameActive && !startTest && (
         <div className="right-column">
           <MiniJuegos onGameStart={() => setIsMiniGameActive(true)} />
         </div>
