@@ -1,0 +1,48 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+
+.welcome-screen {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: linear-gradient(135deg, #1e1e2f, #343456, #2c5364);
+  color: #ffffff;
+  font-family: 'Orbitron', sans-serif;
+  text-align: center;
+  overflow: hidden;
+}
+
+.welcome-title {
+  font-size: 3.5rem;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: #00eaff;
+  text-shadow: 0 0 15px rgba(0, 234, 255, 0.8);
+  margin: 1rem 0;
+}
+
+.welcome-text {
+  font-size: 1.5rem;
+  font-weight: 400;
+  margin-top: 1rem;
+  color: #b8d8ff;
+}
+
+.loading-bar {
+  margin-top: 2rem;
+  height: 6px;
+  background: #00eaff;
+  border-radius: 3px;
+  box-shadow: 0 0 10px rgba(0, 234, 255, 0.5);
+}
+
+.icon-container {
+  margin: 1.5rem 0;
+}
+
+.welcome-icon {
+  font-size: 3rem;
+  color: #00eaff;
+  text-shadow: 0 0 10px rgba(0, 234, 255, 0.8);
+}

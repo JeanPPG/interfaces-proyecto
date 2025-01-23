@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import MiniJuegos from './components/MiniGames';
 import Results from './components/Results';
+import PantallaBienvenida from './components/PantallaBienvenida';
 import './App.css';
 
 /* global GazeRecorderAPI */
 
 const App = () => {
+  const [mostrarBienvenida, setMostrarBienvenida] = useState(true);
   // Estado para habilitar/deshabilitar la cámara
   const [cameraEnabled, setCameraEnabled] = useState(false);
   // Estado para controlar si el minijuego está activo
@@ -133,6 +135,10 @@ const App = () => {
       if (Object.keys(sessionData).length > 0) saveSessionData(sessionData);
     }
   }, [cameraEnabled]);
+
+  if (mostrarBienvenida) {
+    return <PantallaBienvenida onFinish={() => setMostrarBienvenida(false)} />;
+  }
 
   return (
     <div className={`app ${isMiniGameActive ? 'mini-game-active' : ''}`}>
