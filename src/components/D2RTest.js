@@ -3,160 +3,114 @@ import { motion } from 'framer-motion';
 import './D2RTest.css';
 
 const D2RTest = ({ startTest, endTest }) => {
-    const [score, setScore] = useState(0);
-    const [letters, setLetters] = useState([]);
-    const [clickedLetters, setClickedLetters] = useState([]);
-    const [timer, setTimer] = useState(30); // Temporizador de 30 segundos
+    const [isInstructionsVisible, setIsInstructionsVisible] = useState(true);
     const [isTestStarted, setIsTestStarted] = useState(false);
-    const [isTestFinished, setIsTestFinished] = useState(false); // Estado para saber si el test ha terminado
-    const [intervalTime, setIntervalTime] = useState(1000); // Tiempo de intervalo inicial (1 segundo)
+    const [lettersGrid, setLettersGrid] = useState([]);
+    const [score, setScore] = useState(0);
 
-    const generateRandomLetters = () => {
-        const alphabet = 'D'; // Letra a mostrar
-        const letterCount = 98; // Número total de letras a generar
-        let generatedLetters = [];
+    const generateGrid = () => {
+        const rows = 14;
+        const cols = 57;
+        const totalElements = rows * cols;
+        const correctCount = Math.floor(totalElements / 2.22);
+        const correctIndices = new Set();
 
-        for (let i = 0; i < letterCount; i++) {
-            const randomLetter = alphabet[Math.floor(Math.random() * alphabet.length)];
-            const hasStripes = Math.random() > 0.5; // 50% de probabilidad de tener rayas
-            const stripeCount = Math.random() < 0.5 ? 1 : 2; // 50% de probabilidad de tener 1 o 2 rayas
-            generatedLetters.push({
-                letter: randomLetter,
-                hasStripes,
-                stripeCount, // Número de rayas
-                clicked: false,
-            });
+        while (correctIndices.size < correctCount) {
+            correctIndices.add(Math.floor(Math.random() * totalElements));
         }
-        setLetters(generatedLetters);
+
+        const grid = Array.from({ length: totalElements }, (_, index) => ({
+            value: correctIndices.has(index) ? "D''" : Math.random() > 0.5 ? "D'" : 'D',
+            isCorrect: correctIndices.has(index),
+            clicked: false,
+        }));
+
+        setLettersGrid(grid);
     };
 
     const handleLetterClick = (index) => {
-        if (!letters[index].clicked) {
-            const updatedLetters = [...letters];
-            updatedLetters[index].clicked = true;
-            setLetters(updatedLetters);
+        if (!lettersGrid[index].clicked) {
+            const updatedGrid = [...lettersGrid];
+            updatedGrid[index].clicked = true;
+            setLettersGrid(updatedGrid);
 
-            // Solo sumamos al puntaje si la letra tiene exactamente 2 rayas
-            if (letters[index].stripeCount === 2) {
-                setScore(score + 1);
+            if (updatedGrid[index].isCorrect) {
+                setScore((prev) => prev + 1);
             }
         }
     };
 
-    useEffect(() => {
-        if (isTestStarted) {
-            generateRandomLetters();
-
-            // Establecer un intervalo de actualización de letras
-            const interval = setInterval(() => {
-                setLetters((prevLetters) => {
-                    return prevLetters.map((letter) => ({
-                        ...letter,
-                        clicked: false, // Reiniciar el estado de "clicked" de todas las letras
-                    }));
-                });
-            }, intervalTime);
-
-            const timerInterval = setInterval(() => {
-                setTimer((prev) => prev - 1);
-            }, 1000);
-
-            if (timer <= 0) {
-                clearInterval(interval);
-                clearInterval(timerInterval);
-                setIsTestFinished(true); // Marcamos el test como terminado cuando el tiempo se agota
-            }
-
-            // Acelerar el intervalo a medida que el tiempo disminuye
-            if (timer <= 10) {
-                setIntervalTime(500); // 500ms si quedan 10 segundos o menos
-            } else if (timer <= 20) {
-                setIntervalTime(750); // 750ms si quedan entre 10 y 20 segundos
-            }
-
-            return () => {
-                clearInterval(interval);
-                clearInterval(timerInterval);
-            };
-        }
-    }, [isTestStarted, timer, intervalTime]);
-
-    const handleTestFinish = () => {
-        setIsTestFinished(true);
-        endTest();
+    const handleStartTest = () => {
+        generateGrid();
+        setIsTestStarted(true);
     };
+
+
 
     return (
         <div className="test-container">
-            <motion.div className="top-bar">
-                {isTestStarted && !isTestFinished && (
-                    <span className="timer">Tiempo restante: {timer}s</span>
-                )}
+            {isInstructionsVisible && (
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="instructions-container"
+                >
+                    <h2>Instrucciones</h2>
+                    <p>
+                        Este test consiste en identificar las letras <strong>D''</strong> en un
+                        conjunto de estímulos. Haz clic únicamente en las <strong>D''</strong> para
+                        obtener puntos.
+                    </p>
+                    <motion.button
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        onClick={() => setIsInstructionsVisible(false)}
+                    >
+                        Continuar
+                    </motion.button>
+                </motion.div>
+            )}
+
+            {!isInstructionsVisible && !isTestStarted && (
+                <motion.div className="start-screen">
+                    <motion.button
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        onClick={handleStartTest}
+                    >
+                        Iniciar Test
+                    </motion.button>
+                </motion.div>
+            )}
+
+            {isTestStarted && (
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="letters-grid"
+                >
+                    {lettersGrid.map((cell, index) => (
+                        <motion.div
+                            key={index}
+                            className={`letter ${cell.clicked ? (cell.isCorrect ? 'correct' : 'incorrect') : ''}`}
+                            onClick={() => handleLetterClick(index)}
+                        >
+                            {cell.value}
+                        </motion.div>
+                    ))}
+                </motion.div>
+            )}
+
+            {/* Botón para finalizar el test */}
+            {isTestStarted && (
                 <motion.button
                     className="end-test-button"
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
-                    onClick={handleTestFinish}
+                    onClick={endTest}
                 >
                     Finalizar Test
                 </motion.button>
-            </motion.div>
-
-            {isTestStarted && !isTestFinished ? (
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="letters-container"
-                >
-                    <div className="letters-grid">
-                        {letters.map((letter, index) => (
-                            <motion.div
-                                key={index}
-                                className={`letter ${letter.clicked ? (letter.stripeCount === 2 ? 'correct' : 'incorrect') : ''}`}
-                                onClick={() => handleLetterClick(index)}
-                            >
-                                <span className="letter-text">{letter.letter}</span>
-                                {letter.hasStripes && (
-                                    <div className="stripes">
-                                        {[...Array(letter.stripeCount)].map((_, i) => (
-                                            <div key={i} className="stripe"></div>
-                                        ))}
-                                    </div>
-                                )}
-                            </motion.div>
-                        ))}
-                    </div>
-                </motion.div>
-            ) : isTestFinished ? (
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="result-container"
-                >
-                    <h2>Test Completado</h2>
-                    <p>Tu puntaje es: {score}</p>
-                    <motion.button
-                        className="end-test-button"
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
-                        onClick={endTest}
-                    >
-                        Finalizar Test
-                    </motion.button>
-                </motion.div>
-            ) : (
-                <motion.div className="start-screen">
-                    <motion.button
-                        className="start-button"
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
-                        onClick={() => setIsTestStarted(true)}
-                    >
-                        Comenzar Test
-                    </motion.button>
-                </motion.div>
             )}
         </div>
     );
