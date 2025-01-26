@@ -23,7 +23,7 @@ const Results = ({ setCameraEnabled, cameraEnabled, startTest }) => {
   return (
     <div className="results">
       <h2>HERRAMIENTA DE ANÁLISIS DE ATENCIÓN</h2>
-      <p>🎮 Para acceder a los mini juegos, primero debes activar la cámara.</p> {/* Enunciado informativo */}
+      <p style={{ display: cameraEnabled ? 'none' : 'block' }}>🎮 Para acceder a los mini juegos, primero debes activar la cámara.</p> {/* Enunciado informativo */}
       <button disabled={!resultsEnabled}>
         Visualizar Resultados
       </button>
@@ -33,7 +33,7 @@ const Results = ({ setCameraEnabled, cameraEnabled, startTest }) => {
       <button onClick={startTest}>
         Iniciar Test
       </button>
-      
+
       {cameraEnabled && (
         <div className="camera-container">
           <p className="camera-status">📷 La cámara está activada.</p>

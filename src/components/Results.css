@@ -1,93 +1,145 @@
 .results {
-    display: flex;
-    flex-direction: column;
-    gap: 20px; /* Espaciado entre los resultados */
-    background: linear-gradient(135deg, #2a2a2a, #333333); /* Fondo oscuro con gradiente suave */
-    border-radius: 15px;
-    padding: 20px;
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-  }
-  
-  .results:hover {
-    transform: translateY(-5px); /* Efecto de levitación */
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
-  }
-  
-  .results h2 {
-    font-size: 2rem;
-    font-weight: 600;
-    color: #ff6f61; /* Naranja vibrante para el título */
-    text-align: center;
-    margin-bottom: 15px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5); /* Sombra sutil para el título */
-  }
-  
-  .results p {
-    font-size: 1.3rem;
-    color: #e0e0e0; /* Texto claro */
-    background: #444444; /* Fondo oscuro para los resultados */
-    border: 1px solid #666666; /* Borde oscuro */
-    border-radius: 10px;
-    padding: 15px;
-    text-align: center;
-    transition: transform 0.2s ease, background-color 0.3s ease, border-color 0.3s ease;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-  }
-  
-  .results p:hover {
-    transform: scale(1.05);
-    background-color: #ff6f61; /* Naranja al pasar el mouse */
-    border-color: #357abd;
-    color: #fff; /* Texto blanco al pasar el mouse */
-  }
-  
-  .results p:active {
-    transform: scale(0.98); /* Efecto de compresión en clic */
-    background-color: #357abd; /* Azul oscuro al hacer clic */
-    border-color: #2f6a8e;
-  }
-  
-  .results p:focus {
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(72, 132, 211, 0.5); /* Efecto de enfoque */
-  }
-  
-  /* Camera container */
-  .camera-container {
-    margin-top: 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background: #444444; /* Fondo oscuro para la sección de la cámara */
-    padding: 15px;
-    border-radius: 10px;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
-  }
-  
-  .camera-status {
-    font-size: 1rem;
-    margin-bottom: 10px;
-    color: #4caf50; /* Verde brillante para el estado de la cámara */
-    font-weight: bold;
-  }
-  
-  .camera-feed {
-    width: 100%;
-    max-width: 600px;
-    height: auto;
-    border-radius: 10px;
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
-  }
-  
-  .camera-container {
-    position: relative;
-  }
-  
-  .face-box {
-    position: absolute;
-    border: 2px solid red;
-    background-color: rgba(255, 0, 0, 0.3);
-  }
+  display: flex;
+
+  flex-direction: column;
+  gap: 20px;
+  /* Espaciado entre los resultados */
+  background: linear-gradient(135deg, #2a2a2a, #333333);
+  /* Fondo oscuro con gradiente suave */
+  border-radius: 15px;
+  padding: 20px;
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.results:hover {
+  transform: translateY(-5px);
+  /* Efecto de levitación */
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+}
+
+.results h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #c5003c;
+  /* Rojo cálido para el título */
+  text-align: center;
+  margin-bottom: 5px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+  /* Sombra sutil para el título */
+}
+
+.results p {
+  font-size: 1rem;
+  color: #e0e0e0;
+  /* Texto claro */
+  background: #444444;
+  /* Fondo oscuro para los resultados */
+  border: 1px solid #666666;
+  /* Borde oscuro */
+  border-radius: 10px;
+  padding: 6px;
+  text-align: center;
+  transition: transform 0.2s ease, background-color 0.3s ease, border-color 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.results p:hover {
+  transform: scale(1.05);
+  background-color: #ff6f61;
+  /* Naranja al pasar el mouse */
+  border-color: #357abd;
+  color: #fff;
+  /* Texto blanco al pasar el mouse */
+}
+
+.results p:active {
+  transform: scale(0.98);
+  /* Efecto de compresión en clic */
+  background-color: #357abd;
+  /* Azul oscuro al hacer clic */
+  border-color: #2f6a8e;
+}
+
+.results p:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(72, 132, 211, 0.5);
+  /* Efecto de enfoque */
+}
+
+/* Camera container */
+.camera-container {
+  margin-top: 5px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #444444;
+  /* Fondo oscuro para la sección de la cámara */
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+}
+
+.camera-status {
+  font-size: 1rem;
+  margin-bottom: 5px;
+  color: #4caf50;
+  /* Verde brillante para el estado de la cámara */
+  font-weight: bold;
+}
+
+.camera-feed {
+  width: 100%;
+  max-width: 600px;
+  height: auto;
+  border-radius: 10px;
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+}
+
+.camera-container {
+  position: relative;
+}
+
+.face-box {
+  position: absolute;
+  border: 2px solid red;
+  background-color: rgba(255, 0, 0, 0.3);
+}
+
+/* Interactive Elements */
+.results button {
+  font-family: 'Orbitron', sans-serif;
+  padding: 6px 6px;
+  /* Ajuste de tamaño de botones */
+  font-size: 0.85rem;
+  /* Ajuste de tamaño de fuente */
+  font-weight: bold;
+  border: none;
+  border-radius: 20px;
+  background: #c5003c;
+  /* Rojo cálido */
+  color: #fff;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  width: 250px;
+  /* Ancho fijo para todos los botones */
+  margin: 2px auto;
+  /* Centra los botones */
+}
+
+.results button:hover {
+  background-color: #880425;
+  /* Rojo oscuro */
+  transform: scale(1.05);
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.3);
+}
+
+.results button:active {
+  transform: scale(0.95);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
