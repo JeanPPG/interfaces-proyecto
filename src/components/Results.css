@@ -47,7 +47,7 @@
 
 .results p:hover {
   transform: scale(1.05);
-  background-color: #ff6f61;
+  background-color: #9b271c;
   /* Naranja al pasar el mouse */
   border-color: #357abd;
   color: #fff;
