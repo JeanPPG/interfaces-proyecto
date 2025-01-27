@@ -68,11 +68,13 @@ body {
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
+    transition: background-color 0.3s ease;
+    transform-origin: center;
 }
 
 .start-button:hover {
     background-color: #66bb6a; /* Verde más claro */
+    transform: translate(-50%, -50%) scale(1.1);
 }
 
 .start-button:focus {
