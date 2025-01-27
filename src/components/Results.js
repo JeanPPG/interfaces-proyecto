@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import Webcam from "react-webcam";  // Importamos la librería
+import { Camera, Eye, EyeOff, PlayCircle, BarChart2 } from "lucide-react"; // Importamos íconos de lucide-react
+import Webcam from "react-webcam";
 
 import "./Results.css";
 
@@ -23,15 +24,18 @@ const Results = ({ setCameraEnabled, cameraEnabled, startTest }) => {
   return (
     <div className="results">
       <h2>HERRAMIENTA DE ANÁLISIS DE ATENCIÓN</h2>
-      <p style={{ display: cameraEnabled ? 'none' : 'block' }}>🎮 Para acceder a los mini juegos, primero debes activar la cámara.</p> {/* Enunciado informativo */}
-      <button disabled={!resultsEnabled}>
-        Visualizar Resultados
+      <p style={{ display: cameraEnabled ? 'none' : 'block' }}>
+        🎮 Para acceder a los mini juegos, primero debes activar la cámara.
+      </p>
+      <button disabled={!resultsEnabled} className="btn">
+        <BarChart2 className="icon" /> Visualizar Resultados
       </button>
-      <button onClick={toggleCamera}>
+      <button onClick={toggleCamera} className="btn">
+        {cameraEnabled ? <EyeOff className="icon" /> : <Eye className="icon" />}
         {cameraEnabled ? "Desactivar Cámara" : "Activar Cámara"}
       </button>
-      <button onClick={startTest}>
-        Iniciar Test
+      <button onClick={startTest} className="btn">
+        <PlayCircle className="icon" /> Iniciar Test
       </button>
 
       {cameraEnabled && (
@@ -51,6 +55,5 @@ const Results = ({ setCameraEnabled, cameraEnabled, startTest }) => {
     </div>
   );
 };
-
 
 export default Results;

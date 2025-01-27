@@ -1,6 +1,5 @@
 .results {
   display: flex;
-
   flex-direction: column;
   gap: 20px;
   /* Espaciado entre los resultados */
@@ -111,9 +110,14 @@
 /* Interactive Elements */
 .results button {
   font-family: 'Orbitron', sans-serif;
-  padding: 6px 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  /* Espaciado entre icono y texto */
+  padding: 10px 15px;
   /* Ajuste de tamaño de botones */
-  font-size: 0.85rem;
+  font-size: 0.95rem;
   /* Ajuste de tamaño de fuente */
   font-weight: bold;
   border: none;

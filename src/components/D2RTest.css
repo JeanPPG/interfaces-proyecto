@@ -9,30 +9,34 @@
   padding: 20px;
 }
 
-.instructions-container {
+.instructions-container,
+.results-modal {
   text-align: center;
   padding: 20px;
   background-color: #1e1e1e;
   border-radius: 10px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  width: 80%;
+  max-width: 600px;
+  margin: auto;
 }
 
-.instructions-container h2 {
+.instructions-container h2,
+.results-modal h2 {
   font-size: 24px;
   margin-bottom: 10px;
 }
 
-.instructions-container p {
+.instructions-container p,
+.results-modal p {
   font-size: 16px;
   margin-bottom: 20px;
 }
 
-.start-screen {
-  text-align: center;
-}
-
 .start-screen button,
-.instructions-container button {
+.instructions-container button,
+.end-test-button,
+.results-modal button {
   background-color: #4caf50;
   color: white;
   padding: 10px 20px;
@@ -45,23 +49,21 @@
 }
 
 .start-screen button:hover,
-.instructions-container button:hover {
+.instructions-container button:hover,
+.end-test-button:hover,
+.results-modal button:hover {
   background-color: #45a049;
 }
 
 .letters-grid {
   display: grid;
   grid-template-columns: repeat(57, 1fr);
-  /* 57 columnas */
   grid-template-rows: repeat(14, 1fr);
-  /* 14 filas */
   gap: 5px;
   margin: 20px 0;
   width: 100%;
   max-width: 100%;
-  /* Ajuste para que ocupe todo el ancho disponible */
   overflow-x: auto;
-  /* Permite el desplazamiento horizontal si es necesario */
 }
 
 .letter {
@@ -89,16 +91,16 @@
 
 .end-test-button {
   background-color: #ff5733;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  font-size: 16px;
-  margin-top: 20px;
-  transition: background-color 0.3s ease;
-  cursor: pointer;
 }
 
 .end-test-button:hover {
   background-color: #c04f2a;
+}
+
+.results-modal button {
+  background-color: #2196f3;
+}
+
+.results-modal button:hover {
+  background-color: #1976d2;
 }

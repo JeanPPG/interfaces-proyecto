@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import { FaInfoCircle, FaPlay, FaStop } from 'react-icons/fa';
 import './D2RTest.css';
 
 const D2RTest = ({ startTest, endTest }) => {
@@ -7,6 +8,7 @@ const D2RTest = ({ startTest, endTest }) => {
     const [isTestStarted, setIsTestStarted] = useState(false);
     const [lettersGrid, setLettersGrid] = useState([]);
     const [score, setScore] = useState(0);
+    const [isResultsVisible, setIsResultsVisible] = useState(false);
 
     const generateGrid = () => {
         const rows = 14;
@@ -45,7 +47,30 @@ const D2RTest = ({ startTest, endTest }) => {
         setIsTestStarted(true);
     };
 
+    const handleEndTest = () => {
+        setIsTestStarted(false);
+        setIsResultsVisible(true);
+    };
 
+    const getLevel = (score) => {
+        if (score >= 123) return 'Alto';
+        if (score >= 108) return 'Medio alto';
+        if (score >= 93) return 'Medio';
+        if (score >= 78) return 'Medio bajo';
+        return 'Bajo';
+    };
+
+    const getInterpretations = (score) => {
+        const level = getLevel(score);
+        return {
+            level,
+            concentration: score >= 93 ? 'Buena capacidad para mantener la concentración' : 'Problemas para mantener la concentración',
+            speed: score >= 93 ? 'Buena velocidad de procesamiento' : 'Procesamiento lento',
+            precision: score >= 93 ? 'Persona fue precisa' : 'Gran proporción de errores',
+        };
+    };
+
+    const interpretations = getInterpretations(score);
 
     return (
         <div className="test-container">
@@ -55,7 +80,9 @@ const D2RTest = ({ startTest, endTest }) => {
                     animate={{ opacity: 1 }}
                     className="instructions-container"
                 >
-                    <h2>Instrucciones</h2>
+                    <h2>
+                        <FaInfoCircle /> Instrucciones
+                    </h2>
                     <p>
                         Este test consiste en identificar las letras <strong>D''</strong> en un
                         conjunto de estímulos. Haz clic únicamente en las <strong>D''</strong> para
@@ -66,19 +93,19 @@ const D2RTest = ({ startTest, endTest }) => {
                         whileTap={{ scale: 0.9 }}
                         onClick={() => setIsInstructionsVisible(false)}
                     >
-                        Continuar
+                        <FaPlay /> Continuar
                     </motion.button>
                 </motion.div>
             )}
 
-            {!isInstructionsVisible && !isTestStarted && (
+            {!isInstructionsVisible && !isTestStarted && !isResultsVisible && (
                 <motion.div className="start-screen">
                     <motion.button
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
                         onClick={handleStartTest}
                     >
-                        Iniciar Test
+                        <FaPlay /> Iniciar Test
                     </motion.button>
                 </motion.div>
             )}
@@ -101,16 +128,39 @@ const D2RTest = ({ startTest, endTest }) => {
                 </motion.div>
             )}
 
-            {/* Botón para finalizar el test */}
             {isTestStarted && (
                 <motion.button
                     className="end-test-button"
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
-                    onClick={endTest}
+                    onClick={handleEndTest}
                 >
-                    Finalizar Test
+                    <FaStop /> Finalizar Test
                 </motion.button>
+            )}
+
+            {isResultsVisible && (
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="results-modal"
+                >
+                    <h2>Resultados del Test</h2>
+                    <p><strong>Nivel:</strong> {interpretations.level}</p>
+                    <p><strong>Concentración:</strong> {interpretations.concentration}</p>
+                    <p><strong>Velocidad de Trabajo:</strong> {interpretations.speed}</p>
+                    <p><strong>Precisión:</strong> {interpretations.precision}</p>
+                    <motion.button
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        onClick={() => {
+                            setIsResultsVisible(false);
+                            endTest();
+                        }}
+                    >
+                        Cerrar
+                    </motion.button>
+                </motion.div>
             )}
         </div>
     );
