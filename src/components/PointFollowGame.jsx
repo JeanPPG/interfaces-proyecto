@@ -87,6 +87,8 @@ const PointGame = () => {
                     <motion.button
                         className="start-button"
                         onClick={iniciarJuego}
+                        initial={{ scale: 1, x: '-50%', y: '-50%' }}
+                        animate={{ scale: 1}}
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
                     >
