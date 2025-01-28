@@ -1,0 +1,83 @@
+/* Login.css */
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    background: linear-gradient(135deg, #111, #222);
+    /* Fondo oscuro */
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.5);
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 80%;
+    max-width: 400px;
+    background: rgba(0, 0, 0, 0.7);
+    /* Fondo oscuro con opacidad */
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+}
+
+.input-field {
+    padding: 12px;
+    background: #333;
+    border: 2px solid #4a90e2;
+    /* Azul cibernético */
+    border-radius: 10px;
+    color: #e0e0e0;
+    font-size: 1rem;
+    width: 100%;
+    transition: border 0.3s ease;
+}
+
+.input-field:focus {
+    border-color: #ff6f61;
+    /* Rojo cibernético */
+    outline: none;
+}
+
+.login-button {
+    font-family: 'Orbitron', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    /* Espaciado entre icono y texto */
+    padding: 10px 15px;
+    /* Ajuste de tamaño de botones */
+    font-size: 0.95rem;
+    /* Ajuste de tamaño de fuente */
+    font-weight: bold;
+    border: none;
+    border-radius: 20px;
+    background: #c5003c;
+    /* Rojo cálido */
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    width: auto;
+    /* Ancho fijo para todos los botones */
+    margin: 2px auto;
+    /* Centra los botones */
+}
+
+.login-button:hover {
+    background-color: #880425;
+    /* Rojo oscuro */
+    transform: scale(1.05);
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.3);
+}
+
+.login-button:active {
+    transform: scale(0.95);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}

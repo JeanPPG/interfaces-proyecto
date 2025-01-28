@@ -19,7 +19,7 @@ body {
 /* App container */
 .app {
   display: flex;
-  min-height: 100vh;
+  min-height: auto;
   gap: 20px;
   padding: 20px;
   align-items: stretch;
