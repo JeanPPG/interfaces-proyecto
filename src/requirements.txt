@@ -1,0 +1,5 @@
+flask
+psycopg
+bcrypt
+PyJWT
+flask-cors
