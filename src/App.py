@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-import psycopg
+import psycopg2 as psycopg
 import bcrypt
 import jwt
 from flask_cors import CORS
