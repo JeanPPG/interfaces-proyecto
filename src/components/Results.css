@@ -147,3 +147,15 @@
   transform: scale(0.95);
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
+
+.results button:disabled {
+  background-color: #777777;
+  /* Fondo gris para indicar que está deshabilitado */
+  color: #cccccc;
+  /* Color de texto más claro */
+  cursor: not-allowed;
+  /* Cambia el cursor para indicar inactividad */
+  opacity: 0.8;
+  box-shadow: none;
+  /* Opcional: elimina la sombra para mayor claridad */
+}

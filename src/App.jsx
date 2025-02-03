@@ -9,37 +9,23 @@ import './App.css';
 
 const App = () => {
   const [mostrarBienvenida, setMostrarBienvenida] = useState(true);
-  // Estado para habilitar/deshabilitar la cámara
   const [cameraEnabled, setCameraEnabled] = useState(false);
-  // Estado para controlar si el minijuego está activo
   const [isMiniGameActive, setIsMiniGameActive] = useState(false);
-  // Estado para almacenar datos de sesión (como datos de Morphcast y GazeRecorder)
+  const [gamesCompleted, setGamesCompleted] = useState(0); // Nuevo estado para contar los juegos completados
   const [sessionData, setSessionData] = useState({});
-  // Estado para controlar si el test de D2R está activo
   const [startTest, setTestActive] = useState(false);
 
-  /**
-   * Guarda los datos de sesión en un archivo JSON descargable.
-   * @param {Object} data - Datos de la sesión a guardar.
-   */
   const saveSessionData = (data) => {
-    // Send session data to App.py
     fetch('http://localhost:5000/save_session_data', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
     })
-    .then(response => response.json())
-    .then(data => console.log('Success:', data))
-    .catch((error) => console.error('Error:', error));
+      .then(response => response.json())
+      .then(data => console.log('Success:', data))
+      .catch((error) => console.error('Error:', error));
   };
 
-  /**
-   * Inicia el servicio de Morphcast cargando los módulos necesarios.
-   * @returns {Function} - Función para detener Morphcast.
-   */
   const startMorphcast = async () => {
     const scriptLoader = (src, config = null) =>
       new Promise((resolve) => {
@@ -51,31 +37,25 @@ const App = () => {
         document.head.appendChild(script);
       });
 
-    // Carga los scripts necesarios para Morphcast
     await scriptLoader('https://sdk.morphcast.com/mphtools/v1.1/mphtools.js', 'compatibilityUI, compatibilityAutoCheck');
     await scriptLoader('https://ai-sdk.morphcast.com/v1.16/ai-sdk.js');
 
     const CY = window.CY;
     const loader = CY.loader();
 
-    // Configura los módulos de Morphcast
     loader
-      .licenseKey('sk52c05b0d7a4c86845903a5f3e556f024c07299241fd3') // Clave de licencia
-      .addModule(CY.modules().FACE_EMOTION.name, { smoothness: 0.4 }) // Modulo de emociones
-      .addModule(CY.modules().FACE_ATTENTION.name, { smoothness: 0.83 }) // Modulo de atención
-      .addModule(CY.modules().DATA_AGGREGATOR.name, { initialWaitMs: 2000, periodMs: 1000 }); // Agregador de datos
+      .licenseKey('sk52c05b0d7a4c86845903a5f3e556f024c07299241fd3')
+      .addModule(CY.modules().FACE_EMOTION.name, { smoothness: 0.4 })
+      .addModule(CY.modules().FACE_ATTENTION.name, { smoothness: 0.83 })
+      .addModule(CY.modules().DATA_AGGREGATOR.name, { initialWaitMs: 2000, periodMs: 1000 });
 
     const { start, stop } = await loader.load();
-    start(); // Inicia Morphcast
+    start();
     window.addEventListener(CY.modules().DATA_AGGREGATOR.eventName, handleMorphcastData);
 
-    return stop; // Devuelve la función para detener Morphcast
+    return stop;
   };
 
-  /**
-   * Detiene el servicio de Morphcast y elimina los eventos asociados.
-   * @param {Function} stop - Función para detener Morphcast.
-   */
   const stopMorphcast = (stop) => {
     if (stop) {
       stop();
@@ -83,10 +63,6 @@ const App = () => {
     }
   };
 
-  /**
-   * Maneja los datos recibidos de Morphcast.
-   * @param {Object} e - Evento con datos de Morphcast.
-   */
   const handleMorphcastData = (e) => {
     setSessionData((prevData) => ({
       ...prevData,
@@ -94,10 +70,6 @@ const App = () => {
     }));
   };
 
-  /**
-   * Inicia el servicio de GazeRecorder para grabar datos de seguimiento ocular.
-   * @returns {Function} - Función para detener GazeRecorder y obtener los datos.
-   */
   const startGazeRecorder = () => {
     const script = document.createElement('script');
     script.src = 'https://app.gazerecorder.com/GazeRecorderAPI.js';
@@ -105,14 +77,14 @@ const App = () => {
     document.body.appendChild(script);
 
     script.onload = () => {
-      GazeRecorderAPI.Rec(); // Inicia la grabación
+      GazeRecorderAPI.Rec();
     };
 
     script.onerror = () => console.error('Failed to load GazeRecorder script');
 
     return () => {
-      GazeRecorderAPI.StopRec(); // Detiene la grabación
-      const gazeData = GazeRecorderAPI.GetRecData(); // Obtiene los datos grabados
+      GazeRecorderAPI.StopRec();
+      const gazeData = GazeRecorderAPI.GetRecData();
       setSessionData((prevData) => ({
         ...prevData,
         gazeRecorder: gazeData,
@@ -120,14 +92,9 @@ const App = () => {
     };
   };
 
-  // Guarda la función para detener Morphcast
   const [stopMorphcastFn, setStopMorphcastFn] = useState(null);
-  // Ref para almacenar la función de detener GazeRecorder
   const stopGazeRecorderFn = useRef(null);
 
-  /**
-   * Maneja los cambios en el estado de la cámara. Inicia o detiene los servicios según sea necesario.
-   */
   useEffect(() => {
     if (cameraEnabled) {
       startMorphcast().then((stop) => setStopMorphcastFn(() => stop));
@@ -140,7 +107,11 @@ const App = () => {
   }, [cameraEnabled]);
 
   const handleStartTest = () => {
-    setTestActive(true); // Activa el test
+    setTestActive(true);
+  };
+
+  const handleGameEnd = () => {
+    setGamesCompleted((prev) => prev + 1);
   };
 
   if (mostrarBienvenida) {
@@ -151,23 +122,24 @@ const App = () => {
     <div className={`app ${isMiniGameActive ? 'mini-game-active' : ''}`}>
       {!isMiniGameActive && !startTest && (
         <div className={`results ${cameraEnabled ? 'camera-active' : ''}`}>
-          <Results setCameraEnabled={setCameraEnabled} cameraEnabled={cameraEnabled} startTest={handleStartTest} />
+          <Results
+            setCameraEnabled={setCameraEnabled}
+            cameraEnabled={cameraEnabled}
+            startTest={handleStartTest}
+            gamesCompleted={gamesCompleted === 3} // Envía si los minijuegos fueron completados
+          />
         </div>
       )}
+
       {startTest && (
-        
         <div className="mini-game-container">
-          <D2RTest endTest={() => setTestActive(false)}/> {/* Muestra el componente D2RTest cuando el test está activo */}
+          <D2RTest endTest={() => setTestActive(false)} />
         </div>
       )}
+
       {cameraEnabled && !isMiniGameActive && !startTest && (
         <div className="right-column">
-          <MiniJuegos onGameStart={() => setIsMiniGameActive(true)} />
-        </div>
-      )}
-      {isMiniGameActive && (
-        <div className="mini-game-container">
-          <MiniJuegos onGameEnd={() => setIsMiniGameActive(false)} />
+          <MiniJuegos onGameEnd={handleGameEnd} />
         </div>
       )}
     </div>
@@ -175,4 +147,3 @@ const App = () => {
 };
 
 export default App;
-

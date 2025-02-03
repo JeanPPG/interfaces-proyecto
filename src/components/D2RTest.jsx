@@ -22,7 +22,7 @@ const D2RTest = ({ startTest, endTest }) => {
         }
 
         const grid = Array.from({ length: totalElements }, (_, index) => ({
-            value: correctIndices.has(index) ? "D''" : Math.random() > 0.5 ? "D'" : 'D',
+            value: correctIndices.has(index) ? "d''" : Math.random() > 0.5 ? "d'" : 'd',
             isCorrect: correctIndices.has(index),
             clicked: false,
         }));

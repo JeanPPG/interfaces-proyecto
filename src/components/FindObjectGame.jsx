@@ -1,112 +1,121 @@
-// Importar Framer Motion
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { XCircle, PlayCircle } from 'lucide-react'; // Importa íconos de lucide-icons
 import './FindObjectGame.css';
 
 const EMOJIS = ['🍎', '🍌', '🍇', '🍊', '🍐', '🍉', '🍓', '🥝', '🍒', '🥭', '🍍', '🥥'];
 const INITIAL_TIME = 30;
 
-const FindObject = () => {
-    const [jugando, setJugando] = useState(false);
-    const [nivel, setNivel] = useState(1);
-    const [puntuacion, setPuntuacion] = useState(0);
-    const [tiempo, setTiempo] = useState(INITIAL_TIME);
-    const [objetoObjetivo, setObjetoObjetivo] = useState('');
-    const [objetos, setObjetos] = useState([]);
+const FindObject = ({ onClose }) => {
+    const [playing, setPlaying] = useState(false);
+    const [level, setLevel] = useState(1);
+    const [score, setScore] = useState(0);
+    const [time, setTime] = useState(INITIAL_TIME);
+    const [targetObject, setTargetObject] = useState('');
+    const [objects, setObjects] = useState([]);
 
-    const generarObjetos = () => {
-        const numObjetos = Math.min(nivel * 5, 20);
-        const nuevosObjetos = [];
+    // Genera la lista de objetos, garantizando que el objetivo aparezca solo una vez
+    const generateObjects = () => {
+        const numObjects = Math.min(level * 5, 20);
+        // Selecciona el objeto objetivo aleatoriamente
+        const target = EMOJIS[Math.floor(Math.random() * EMOJIS.length)];
+        setTargetObject(target);
 
-        // Seleccionar objeto objetivo
-        const objetivo = EMOJIS[Math.floor(Math.random() * EMOJIS.length)];
-        setObjetoObjetivo(objetivo);
-
-        // Generar objetos aleatorios
-        for (let i = 0; i < numObjetos; i++) {
-            nuevosObjetos.push(EMOJIS[Math.floor(Math.random() * EMOJIS.length)]);
+        const newObjects = [];
+        // Rellenar con emojis que NO sean el objetivo
+        for (let i = 0; i < numObjects - 1; i++) {
+            let randomEmoji;
+            do {
+                randomEmoji = EMOJIS[Math.floor(Math.random() * EMOJIS.length)];
+            } while (randomEmoji === target);
+            newObjects.push(randomEmoji);
         }
-
-        // Añadir el objeto objetivo en una posición aleatoria
-        const posicionObjetivo = Math.floor(Math.random() * numObjetos);
-        nuevosObjetos[posicionObjetivo] = objetivo;
-
-        setObjetos(nuevosObjetos);
+        // Insertar el objeto objetivo en una posición aleatoria
+        const insertIndex = Math.floor(Math.random() * numObjects);
+        newObjects.splice(insertIndex, 0, target);
+        setObjects(newObjects);
     };
 
+    // Temporizador: decrementa el tiempo cada segundo
     useEffect(() => {
-        let temporizador;
-        if (jugando && tiempo > 0) {
-            temporizador = setInterval(() => {
-                setTiempo(prev => prev - 1);
+        let timerInterval;
+        if (playing && time > 0) {
+            timerInterval = setInterval(() => {
+                setTime(prev => prev - 1);
             }, 1000);
-        } else if (tiempo === 0) {
-            finalizarJuego();
+        } else if (time === 0) {
+            endGame();
         }
-        return () => clearInterval(temporizador);
-    }, [jugando, tiempo]);
+        return () => clearInterval(timerInterval);
+    }, [playing, time]);
 
-    const iniciarJuego = () => {
-        setJugando(true);
-        setNivel(1);
-        setPuntuacion(0);
-        setTiempo(INITIAL_TIME);
-        generarObjetos();
+    const startGame = () => {
+        setPlaying(true);
+        setLevel(1);
+        setScore(0);
+        setTime(INITIAL_TIME);
+        generateObjects();
     };
 
-    const finalizarJuego = () => {
-        setJugando(false);
-        setTiempo(0);
+    const endGame = () => {
+        setPlaying(false);
     };
 
-    const manejarClick = (objeto) => {
-        if (objeto === objetoObjetivo) {
-            setPuntuacion(prev => prev + nivel * 10);
-            setNivel(prev => prev + 1);
-            generarObjetos();
+    // Maneja el clic sobre un objeto
+    const handleClick = (object) => {
+        if (!playing) return;
+        if (object === targetObject) {
+            setScore(prev => prev + level * 10);
+            setLevel(prev => prev + 1);
+            generateObjects();
         } else {
-            setPuntuacion(prev => Math.max(0, prev - 5));
+            setScore(prev => Math.max(0, prev - 5));
         }
     };
 
     return (
         <div className="game-container">
             <div className="game-board">
-                {jugando ? (
+                {playing ? (
                     <>
                         <div className="score-panel">
-                            <div>Puntuación: {puntuacion}</div>
-                            <div>Encuentra: <span className="target-object">{objetoObjetivo}</span></div>
-                            <div>Tiempo: {tiempo}s</div>
+                            <div>Puntuación: {score}</div>
+                            <div>
+                                Encuentra: <span className="target-object">{targetObject}</span>
+                            </div>
+                            <div>Tiempo: {time}s</div>
                         </div>
                         <div className="objects-container">
-                            {objetos.map((objeto, index) => (
+                            {objects.map((object, index) => (
                                 <motion.div
                                     key={index}
                                     className="object"
                                     whileHover={{ scale: 1.1 }}
-                                    onClick={() => manejarClick(objeto)}
+                                    onClick={() => handleClick(object)}
                                 >
-                                    {objeto}
+                                    {object}
                                 </motion.div>
                             ))}
                         </div>
-                        <div className="level-indicator">Nivel {nivel}</div>
+                        <div className="level-indicator">Nivel {level}</div>
                     </>
-                ) : tiempo === 0 ? (
-                    <motion.div 
+                ) : time === 0 ? (
+                    <motion.div
                         className="game-over"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                     >
-                        <div>Puntuación Final: {puntuacion}</div>
-                        <button className="start-button" onClick={iniciarJuego}>
-                            Jugar de Nuevo
+                        <div>Puntuación Final: {score}</div>
+                        <button
+                            className="close-button"
+                            onClick={() => { onClose && onClose(); }}
+                        >
+                            <XCircle size={24} /> Cerrar Juego
                         </button>
                     </motion.div>
                 ) : (
-                    <button className="start-button" onClick={iniciarJuego}>
-                        Iniciar Juego
+                    <button className="start-button" onClick={startGame}>
+                        <PlayCircle size={24} /> Iniciar Juego
                     </button>
                 )}
             </div>

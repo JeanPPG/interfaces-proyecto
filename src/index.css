@@ -2,21 +2,23 @@
 body {
   margin: 0;
   font-family: 'Roboto', sans-serif;
-  background: #111;
+  background: #000000;
   /* Fondo oscuro */
   color: #e0e0e0;
 }
 
 .main-container {
   display: flex;
-  height: 100%;
+  min-height: 100dvh;
+  /* ✅ Usa min-height en lugar de height */
   width: 100%;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
+  /* ✅ Alinea elementos al inicio (arriba) */
   align-items: center;
-  height: 100vh;
   background: linear-gradient(135deg, #1f1f1f, #0f0f0f);
-  /* Fondo oscuro con gradiente */
+  overflow-y: auto;
+  /* ✅ Permite scroll vertical si el contenido excede */
 }
 
 .app-title {

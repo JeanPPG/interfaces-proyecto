@@ -1,63 +1,85 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
+import { Play, Timer, Trophy, X, Target } from 'lucide-react';
 import './PointFollowGame.css';
 
-const PointGame = () => {
+const PointGame = ({ onClose }) => {
     const [punto, setPunto] = useState({ x: 50, y: 50 });
     const [puntuacion, setPuntuacion] = useState(0);
     const [fallos, setFallos] = useState(0);
     const [jugando, setJugando] = useState(false);
     const [tiempo, setTiempo] = useState(15);
+    const [ripple, setRipple] = useState(null);
+    const timeoutRef = useRef();
 
     useEffect(() => {
-        let intervalo;
         if (jugando) {
-            intervalo = setInterval(() => {
+            const moverPunto = () => {
                 setPunto({
                     x: Math.random() * 90 + 5,
                     y: Math.random() * 90 + 5,
                 });
-            }, 1000);
+                const delay = Math.random() * 500 + 500;
+                timeoutRef.current = setTimeout(moverPunto, delay);
+            };
+
+            moverPunto();
 
             const tiempoIntervalo = setInterval(() => {
                 setTiempo((prev) => {
                     if (prev <= 1) {
-                        clearInterval(intervalo);
                         clearInterval(tiempoIntervalo);
+                        clearTimeout(timeoutRef.current);
                         setJugando(false);
-                        alert(`¡Fin del Juego! Tu puntuación es ${puntuacion}`);
-                        return 15; // Reinicia el tiempo
+                        return 0;
                     }
                     return prev - 1;
                 });
             }, 1000);
 
             return () => {
-                clearInterval(intervalo);
                 clearInterval(tiempoIntervalo);
+                clearTimeout(timeoutRef.current);
             };
         }
-    }, [jugando, puntuacion]);
+    }, [jugando]);
 
     const manejarClick = (e) => {
         e.stopPropagation();
+        if (!jugando) return;
+
         setPuntuacion((prev) => prev + 1);
-        setTiempo((prev) => prev + 2); // Aumenta el tiempo al acertar
+        clearTimeout(timeoutRef.current);
+        setPunto({
+            x: Math.random() * 90 + 5,
+            y: Math.random() * 90 + 5,
+        });
+        const delay = Math.random() * 500 + 500;
+        timeoutRef.current = setTimeout(() => {
+            setPunto({
+                x: Math.random() * 90 + 5,
+                y: Math.random() * 90 + 5,
+            });
+        }, delay);
     };
 
-    const manejarFallo = () => {
+    const manejarFallo = (e) => {
         if (jugando) {
             setFallos((prev) => prev + 1);
-            setTiempo((prev) => (prev > 2 ? prev - 2 : 0)); // Reduce el tiempo al fallar
+            const rect = e.currentTarget.getBoundingClientRect();
+            setRipple({
+                x: e.clientX - rect.left,
+                y: e.clientY - rect.top
+            });
+            setTimeout(() => setRipple(null), 600);
         }
     };
 
-    const iniciarJuego = (e) => {
-        e.stopPropagation();
-        setJugando(true);
+    const reiniciarJuego = () => {
+        setTiempo(15);
         setPuntuacion(0);
         setFallos(0);
-        setTiempo(15);
+        onClose();
     };
 
     return (
@@ -74,25 +96,67 @@ const PointGame = () => {
                             onClick={manejarClick}
                             initial={{ scale: 0 }}
                             animate={{ scale: 1 }}
-                            transition={{ duration: 0.3 }}
-                        />
-                        <div className="score-board">
-                            Puntuación: {puntuacion}
-                            <br />
-                            Fallos: {fallos}
+                            transition={{ type: 'spring', stiffness: 300 }}
+                            key={`${punto.x}-${punto.y}`}
+                        >
+                            <Target size={24} color="#fff" />
+                        </motion.div>
+
+                        <div className="indicadores">
+                            <div className="score-board">
+                                <Trophy size={20} /> {puntuacion}
+                                <span className="separador">|</span>
+                                <X size={20} /> {fallos}
+                            </div>
+                            <div className="timer">
+                                <Timer size={20} /> {tiempo}s
+                            </div>
                         </div>
-                        <div className="timer">Tiempo: {tiempo}s</div>
+
+                        {ripple && (
+                            <motion.div
+                                className="ripple"
+                                initial={{ scale: 0, opacity: 1 }}
+                                animate={{ scale: 2, opacity: 0 }}
+                                style={{
+                                    left: ripple.x,
+                                    top: ripple.y,
+                                }}
+                            />
+                        )}
                     </>
+                ) : tiempo === 0 ? (
+                    <motion.div
+                        className="game-over"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                    >
+                        <div className="game-over-content">
+                            <h2>¡Tiempo terminado!</h2>
+                            <div className="puntuacion-final">
+                                <Trophy size={32} />
+                                <span>{puntuacion}</span>
+                            </div>
+                            <button
+                                className="close-button"
+                                onClick={reiniciarJuego}
+                            >
+                                <X size={18} /> Cerrar Juego
+                            </button>
+                        </div>
+                    </motion.div>
                 ) : (
                     <motion.button
                         className="start-button"
-                        onClick={iniciarJuego}
-                        initial={{ scale: 1, x: '-50%', y: '-50%' }}
-                        animate={{ scale: 1}}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setJugando(true);
+                        }}
+                        initial={{ scale: 1 }}
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
                     >
-                        Iniciar Juego
+                        <Play size={20} /> Comenzar
                     </motion.button>
                 )}
             </div>
