@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import { motion } from 'framer-motion';
 import './index.css';
 import App from './App';
-import Login from './components/Login';
+import Login from './components/login';
 import Register from './components/register';
 import reportWebVitals from './reportWebVitals';
 
@@ -39,7 +39,7 @@ const Index = () => {
   return (
     <div className="main-container">
       {/* Condicionalmente mostrar el título solo si no está autenticado */}
-      {!isAuthenticated && (
+        {!isAuthenticated && (
         <motion.h1
           className="app-title"
           initial={{ opacity: 0 }}
@@ -64,27 +64,27 @@ const Index = () => {
           >
             <div className="left-form">
               <motion.h2
-                initial={{ x: -100 }}
-                animate={{ x: 0 }}
-                transition={{ type: 'spring', stiffness: 120 }}
-              >
+                    initial={{ x: -100 }}
+                    animate={{ x: 0 }}
+                    transition={{ type: 'spring', stiffness: 120 }}
+                  >
                 Iniciar sesión
               </motion.h2>
-              <Login onLoginSuccess={handleLoginSuccess} />
+                    <Login onLoginSuccess={handleLoginSuccess} />
             </div>
             <div className="right-form">
               <motion.h2
-                initial={{ x: 100 }}
-                animate={{ x: 0 }}
-                transition={{ type: 'spring', stiffness: 120 }}
-              >
+                    initial={{ x: 100 }}
+                    animate={{ x: 0 }}
+                    transition={{ type: 'spring', stiffness: 120 }}
+                  >
                 ¿No tienes cuenta? Regístrate
               </motion.h2>
-              <Register onRegisterSuccess={handleRegisterSuccess} />
+                    <Register onRegisterSuccess={handleRegisterSuccess} />
             </div>
-          </motion.div>
+                  </motion.div>
         </div>
-      )}
+        )}
     </div>
   );
 };

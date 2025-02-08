@@ -16,15 +16,42 @@ const App = () => {
   const [startTest, setTestActive] = useState(false);
 
   const saveSessionData = (data) => {
+    // Calcular timestamp de la sesión
+    const sessionTimestamp = new Date().toISOString();
+    
+    // Estructurar datos para enviar
+    const payload = {
+      timestamp: sessionTimestamp,
+      ...data
+    };
+  
     fetch('http://localhost:5000/save_session_data', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
+      body: JSON.stringify(payload),
     })
-      .then(response => response.json())
-      .then(data => console.log('Success:', data))
+      .then(response => {
+        if (!response.ok) throw new Error('Error en la respuesta del servidor');
+        return response.json();
+      })
+      .then(data => console.log('Datos guardados:', data))
       .catch((error) => console.error('Error:', error));
   };
+  
+  // Modificar el useEffect para limpiar datos después de guardar
+  useEffect(() => {
+    if (cameraEnabled) {
+      startMorphcast().then((stop) => setStopMorphcastFn(() => stop));
+      stopGazeRecorderFn.current = startGazeRecorder();
+    } else {
+      if (stopMorphcastFn) stopMorphcast(stopMorphcastFn);
+      if (stopGazeRecorderFn.current) stopGazeRecorderFn.current();
+      if (Object.keys(sessionData).length > 0) {
+        saveSessionData(sessionData);
+        setSessionData({}); // Limpiar datos después de guardar
+      }
+    }
+  }, [cameraEnabled]);
 
   const startMorphcast = async () => {
     const scriptLoader = (src, config = null) =>
@@ -45,7 +72,6 @@ const App = () => {
 
     loader
       .licenseKey('sk52c05b0d7a4c86845903a5f3e556f024c07299241fd3')
-      .addModule(CY.modules().FACE_EMOTION.name, { smoothness: 0.4 })
       .addModule(CY.modules().FACE_ATTENTION.name, { smoothness: 0.83 })
       .addModule(CY.modules().DATA_AGGREGATOR.name, { initialWaitMs: 2000, periodMs: 1000 });
 

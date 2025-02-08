@@ -30,7 +30,7 @@ const Login = ({ onLoginSuccess }) => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1 }}
-        >
+                    >
             <motion.form
                 onSubmit={handleLogin}
                 initial={{ scale: 0.8 }}
@@ -40,35 +40,35 @@ const Login = ({ onLoginSuccess }) => {
             >
                 <motion.input
                     type="text"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
                     placeholder="Usuario"
                     required
                     className="input-field"
                     whileFocus={{ scale: 1.05 }}
                     transition={{ type: 'spring', stiffness: 150 }}
-                />
+                            />
                 <motion.input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                                type="password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
                     placeholder="Contraseña"
                     required
                     className="input-field"
                     whileFocus={{ scale: 1.05 }}
                     transition={{ type: 'spring', stiffness: 150 }}
-                />
+                            />
                 <motion.button
-                    type="submit"
+                                type="submit"
                     className="login-button"
                     whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.95 }}
+                                whileTap={{ scale: 0.95 }}
                     transition={{ type: 'spring', stiffness: 300 }}
-                >
-                    Iniciar Sesión
+                            >
+                                Iniciar Sesión
                 </motion.button>
-            </motion.form>
-        </motion.div>
+                        </motion.form>
+                </motion.div>
     );
 };
 
