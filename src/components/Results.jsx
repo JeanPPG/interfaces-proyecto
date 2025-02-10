@@ -1,25 +1,25 @@
 // Results.jsx
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Camera, Eye, EyeOff, PlayCircle, BarChart2 } from "lucide-react";
 import Webcam from "react-webcam";
 import Dashboard from "./Dashboard"; // Importa el componente Dashboard
 import "./Results.css";
 
-const Results = ({ setCameraEnabled, cameraEnabled, startTest, gamesCompleted, token }) => {
-  // Estado para habilitar el botón de iniciar test y visualizar resultados
-  const [resultsEnabled, setResultsEnabled] = useState(false);
-  // Estado para mostrar el dashboard
+const Results = ({
+  setCameraEnabled,
+  cameraEnabled,
+  startTest,
+  gamesCompleted,
+  token,
+  testFinished,
+  toggleCameraEnabled,
+}) => {
   const [showDashboard, setShowDashboard] = useState(false);
 
-  useEffect(() => {
-    // Cuando se termine el test, se desactiva la cámara y se habilita el botón de resultados
-    if (gamesCompleted) {
-      setCameraEnabled(false);
-      setResultsEnabled(true);
-    } else {
-      setResultsEnabled(cameraEnabled && gamesCompleted);
-    }
-  }, [cameraEnabled, gamesCompleted, setCameraEnabled]);
+  // El botón "Iniciar Test" se activa si los minijuegos han finalizado y el test aún no se completó.
+  const isIniciarTestEnabled = gamesCompleted && !testFinished;
+  // El botón "Visualizar Resultados" se activa solo si el test D2R ha finalizado.
+  const isVisualizarResultadosEnabled = testFinished;
 
   const toggleCamera = () => {
     setCameraEnabled((prev) => !prev);
@@ -29,7 +29,6 @@ const Results = ({ setCameraEnabled, cameraEnabled, startTest, gamesCompleted, t
     setShowDashboard(true);
   };
 
-  // Si se debe mostrar el dashboard, se renderiza el componente Dashboard
   if (showDashboard) {
     return <Dashboard token={token} onClose={() => setShowDashboard(false)} />;
   }
@@ -38,32 +37,38 @@ const Results = ({ setCameraEnabled, cameraEnabled, startTest, gamesCompleted, t
     <div className="results p-4">
       <h2 className="text-2xl font-bold mb-4">HERRAMIENTA DE ANÁLISIS DE ATENCIÓN</h2>
       {cameraEnabled ? null : (
-        <p className="mb-4">🎮 Para acceder a los mini juegos, primero debes activar la cámara.</p>
+        <p className="mb-4">
+          🎮 Para acceder a los mini juegos, primero debes activar la cámara.
+        </p>
       )}
 
       {/* Botón para visualizar resultados */}
       <button
-        disabled={!resultsEnabled}
+        disabled={!isVisualizarResultadosEnabled}
         onClick={handleShowDashboard}
         className="btn flex items-center space-x-2 mb-2"
       >
-        <BarChart2 className="icon" /> 
+        <BarChart2 className="icon" />
         <span>Visualizar Resultados</span>
       </button>
 
       {/* Botón para activar/desactivar la cámara */}
-      <button onClick={toggleCamera} className="btn flex items-center space-x-2 mb-2">
+      <button
+        disabled={!toggleCameraEnabled}
+        onClick={toggleCamera}
+        className="btn flex items-center space-x-2 mb-2"
+      >
         {cameraEnabled ? <EyeOff className="icon" /> : <Eye className="icon" />}
         <span>{cameraEnabled ? "Desactivar Cámara" : "Activar Cámara"}</span>
       </button>
 
       {/* Botón para iniciar el test */}
       <button
-        disabled={!resultsEnabled}
+        disabled={!isIniciarTestEnabled}
         onClick={startTest}
         className="btn flex items-center space-x-2 mb-2"
       >
-        <PlayCircle className="icon" /> 
+        <PlayCircle className="icon" />
         <span>Iniciar Test</span>
       </button>
 

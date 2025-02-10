@@ -4,7 +4,7 @@ import { XCircle, PlayCircle } from 'lucide-react'; // Importa íconos de lucide
 import './FindObjectGame.css';
 
 const EMOJIS = ['🍎', '🍌', '🍇', '🍊', '🍐', '🍉', '🍓', '🥝', '🍒', '🥭', '🍍', '🥥'];
-const INITIAL_TIME = 30;
+const INITIAL_TIME = 15;
 
 const FindObject = ({ onClose }) => {
     const [playing, setPlaying] = useState(false);

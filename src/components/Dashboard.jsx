@@ -1,7 +1,7 @@
 // Dashboard.jsx
 import React, { useEffect, useState } from "react";
 
-const Dashboard = ({ token, onClose }) => {
+const Dashboard = ({ onClose }) => {
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -9,11 +9,7 @@ const Dashboard = ({ token, onClose }) => {
   useEffect(() => {
     const fetchResults = async () => {
       try {
-        const res = await fetch("http://localhost:5000/get_results", {
-          headers: {
-            "Authorization": `Bearer ${token}`
-          }
-        });
+        const res = await fetch("http://localhost:5000/get_results");
         const json = await res.json();
         if (json.success) {
           setData(json);
@@ -27,7 +23,7 @@ const Dashboard = ({ token, onClose }) => {
     };
 
     fetchResults();
-  }, [token]);
+  }, []); // Eliminada la dependencia del token
 
   if (loading) {
     return <div className="p-4">Cargando resultados...</div>;

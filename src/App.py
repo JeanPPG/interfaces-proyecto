@@ -1,7 +1,7 @@
+# APP.py
 from flask import Flask, request, jsonify
 import psycopg2 as psycopg
 import bcrypt
-import jwt
 from flask_cors import CORS
 import json
 from datetime import datetime
@@ -28,26 +28,6 @@ if get_db_connection() is None:
 else:
     print("El servidor está listo para recibir peticiones.")
 
-# Función auxiliar para extraer el user_id del token JWT enviado en los headers
-def get_user_id_from_token():
-    auth_header = request.headers.get('Authorization', None)
-    if not auth_header:
-        return None, "Token de autorización no proporcionado"
-    parts = auth_header.split()
-    if len(parts) != 2 or parts[0] != 'Bearer':
-        return None, "Formato de token inválido"
-    token = parts[1]
-    try:
-        payload = jwt.decode(token, 'your_jwt_secret', algorithms=['HS256'])
-        user_id = payload.get('user_id')
-        if not user_id:
-            return None, "Token inválido: user_id no encontrado"
-        return user_id, None
-    except jwt.ExpiredSignatureError:
-        return None, "El token ha expirado"
-    except jwt.InvalidTokenError:
-        return None, "Token inválido"
-
 # =====================================================
 # Ruta para registrar un nuevo usuario
 # =====================================================
@@ -58,22 +38,25 @@ def register():
     password = data.get('password')
 
     conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute('SELECT * FROM users WHERE email = %s', (email,))
-    user = cursor.fetchone()
+    if conn is None:
+        return jsonify({'success': False, 'message': 'Error en la conexión a la base de datos'}), 500
 
-    if user:
-        print("El usuario ya existe")
-        return jsonify({'success': False, 'message': 'El usuario ya existe'}), 400
+    with conn:
+        with conn.cursor() as cursor:
+            cursor.execute('SELECT * FROM users WHERE email = %s', (email,))
+            user = cursor.fetchone()
 
-    # Hashear la contraseña
-    hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
-    hashed_password_str = hashed_password.decode('utf-8')
-    cursor.execute('INSERT INTO users (email, password) VALUES (%s, %s)', (email, hashed_password_str))
-    conn.commit()
-    cursor.close()
+            if user:
+                print("El usuario ya existe")
+                return jsonify({'success': False, 'message': 'El usuario ya existe'}), 400
+
+            # Hashear la contraseña
+            hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+            hashed_password_str = hashed_password.decode('utf-8')
+            cursor.execute('INSERT INTO users (email, password) VALUES (%s, %s)', (email, hashed_password_str))
+            conn.commit()
+
     conn.close()
-
     print("Usuario registrado correctamente")
     return jsonify({'success': True, 'message': 'Usuario registrado correctamente'}), 201
 
@@ -87,36 +70,36 @@ def login():
     password = data.get('password')
 
     conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute('SELECT * FROM users WHERE email = %s', (email,))
-    user = cursor.fetchone()
+    if conn is None:
+        return jsonify({'success': False, 'message': 'Error en la conexión a la base de datos'}), 500
 
-    if not user:
-        return jsonify({'success': False, 'message': 'Usuario no encontrado'}), 400
+    with conn:
+        with conn.cursor() as cursor:
+            cursor.execute('SELECT * FROM users WHERE email = %s', (email,))
+            user = cursor.fetchone()
 
-    stored_password = user[2]  # Se asume que la contraseña está en el tercer campo (índice 2)
-    if not bcrypt.checkpw(password.encode('utf-8'), stored_password.encode('utf-8')):
-        return jsonify({'success': False, 'message': 'Credenciales incorrectas'}), 400
+            if not user:
+                return jsonify({'success': False, 'message': 'Usuario no encontrado'}), 400
 
-    token = jwt.encode({'user_id': user[0]}, 'your_jwt_secret', algorithm='HS256')
+            stored_password = user[2]  # Se asume que la contraseña está en el tercer campo (índice 2)
+            if not bcrypt.checkpw(password.encode('utf-8'), stored_password.encode('utf-8')):
+                return jsonify({'success': False, 'message': 'Credenciales incorrectas'}), 400
 
-    cursor.close()
     conn.close()
-
-    return jsonify({'success': True, 'token': token})
+    # En lugar de retornar un token, se retorna el user_id para identificar al usuario
+    return jsonify({'success': True, 'user_id': user[0]}), 200
 
 # =====================================================
 # Ruta para guardar los datos de la sesión y realizar la comparación automática
 # =====================================================
 @app.route('/save_session_data', methods=['POST'])
 def save_session_data():
-    user_id, error = get_user_id_from_token()
-    if error:
-        return jsonify({'success': False, 'message': error}), 401
+    data = request.get_json()
+    user_id = data.get('user_id')
+    if not user_id:
+        return jsonify({'success': False, 'message': 'user_id no proporcionado'}), 400
 
     try:
-        data = request.get_json()
-
         # Cálculo de promedios para datos de Morphcast
         morphcast_data = data.get('morphcast', [])
         if morphcast_data:
@@ -134,122 +117,124 @@ def save_session_data():
             avg_x, avg_y = 0, 0
 
         conn = get_db_connection()
-        cursor = conn.cursor()
+        if conn is None:
+            return jsonify({'success': False, 'message': 'Error en la conexión a la base de datos'}), 500
 
-        # Crear tabla session_metrics (si no existe) con relación al usuario
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS session_metrics (
-                id SERIAL PRIMARY KEY,
-                user_id INTEGER REFERENCES users(id),
-                session_date TIMESTAMP,
-                avg_attention FLOAT,
-                avg_gaze_x FLOAT,
-                avg_gaze_y FLOAT,
-                raw_data JSONB
-            )
-        ''')
+        with conn:
+            with conn.cursor() as cursor:
+                # Crear tabla session_metrics (si no existe) con relación al usuario
+                cursor.execute('''
+                    CREATE TABLE IF NOT EXISTS session_metrics (
+                        id SERIAL PRIMARY KEY,
+                        user_id INTEGER REFERENCES users(id),
+                        session_date TIMESTAMP,
+                        avg_attention FLOAT,
+                        avg_gaze_x FLOAT,
+                        avg_gaze_y FLOAT,
+                        raw_data JSONB
+                    )
+                ''')
 
-        # Insertar los datos de la sesión
-        cursor.execute('''
-            INSERT INTO session_metrics 
-            (user_id, session_date, avg_attention, avg_gaze_x, avg_gaze_y, raw_data)
-            VALUES (%s, %s, %s, %s, %s, %s)
-            RETURNING id
-        ''', (
-            user_id,
-            datetime.now(),
-            round(avg_attention, 2),
-            round(avg_x, 2),
-            round(avg_y, 2),
-            json.dumps(data)
-        ))
-        session_metric_id = cursor.fetchone()[0]
-        conn.commit()
-        
-        # -------------------------------
-        # Comparación automática
-        # -------------------------------
-        # Crear tabla de métricas de referencia (si no existe)
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS reference_metrics (
-                id SERIAL PRIMARY KEY,
-                avg_attention FLOAT,
-                avg_gaze_x FLOAT,
-                avg_gaze_y FLOAT,
-                computed_date TIMESTAMP
-            )
-        ''')
+                # Insertar los datos de la sesión
+                cursor.execute('''
+                    INSERT INTO session_metrics 
+                    (user_id, session_date, avg_attention, avg_gaze_x, avg_gaze_y, raw_data)
+                    VALUES (%s, %s, %s, %s, %s, %s)
+                    RETURNING id
+                ''', (
+                    user_id,
+                    datetime.now(),
+                    round(avg_attention, 2),
+                    round(avg_x, 2),
+                    round(avg_y, 2),
+                    json.dumps(data)
+                ))
+                session_metric_id = cursor.fetchone()[0]
+                conn.commit()
 
-        # Crear tabla para resultados comparativos (si no existe)
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS comparative_results (
-                id SERIAL PRIMARY KEY,
-                user_id INTEGER REFERENCES users(id),
-                session_metric_id INTEGER REFERENCES session_metrics(id),
-                diff_attention FLOAT,
-                diff_gaze_x FLOAT,
-                diff_gaze_y FLOAT,
-                comparison_date TIMESTAMP,
-                raw_comparison JSONB
-            )
-        ''')
+                # -------------------------------
+                # Comparación automática
+                # -------------------------------
+                # Crear tabla de métricas de referencia (si no existe)
+                cursor.execute('''
+                    CREATE TABLE IF NOT EXISTS reference_metrics (
+                        id SERIAL PRIMARY KEY,
+                        avg_attention FLOAT,
+                        avg_gaze_x FLOAT,
+                        avg_gaze_y FLOAT,
+                        computed_date TIMESTAMP
+                    )
+                ''')
 
-        # Obtener la métrica de referencia más reciente
-        cursor.execute('''
-            SELECT avg_attention, avg_gaze_x, avg_gaze_y FROM reference_metrics 
-            ORDER BY computed_date DESC LIMIT 1
-        ''')
-        reference = cursor.fetchone()
+                # Crear tabla para resultados comparativos (si no existe)
+                cursor.execute('''
+                    CREATE TABLE IF NOT EXISTS comparative_results (
+                        id SERIAL PRIMARY KEY,
+                        user_id INTEGER REFERENCES users(id),
+                        session_metric_id INTEGER REFERENCES session_metrics(id),
+                        diff_attention FLOAT,
+                        diff_gaze_x FLOAT,
+                        diff_gaze_y FLOAT,
+                        comparison_date TIMESTAMP,
+                        raw_comparison JSONB
+                    )
+                ''')
 
-        if reference:
-            ref_avg_attention, ref_avg_gaze_x, ref_avg_gaze_y = reference
+                # Obtener la métrica de referencia más reciente
+                cursor.execute('''
+                    SELECT avg_attention, avg_gaze_x, avg_gaze_y FROM reference_metrics 
+                    ORDER BY computed_date DESC LIMIT 1
+                ''')
+                reference = cursor.fetchone()
 
-            # Calcular las diferencias entre la sesión del usuario y la referencia
-            diff_attention = round(avg_attention - ref_avg_attention, 2)
-            diff_gaze_x = round(avg_x - ref_avg_gaze_x, 2)
-            diff_gaze_y = round(avg_y - ref_avg_gaze_y, 2)
+                if reference:
+                    ref_avg_attention, ref_avg_gaze_x, ref_avg_gaze_y = reference
 
-            comparison_data = {
-                'session_metric': {
-                    'id': session_metric_id,
-                    'avg_attention': round(avg_attention, 2),
-                    'avg_gaze_x': round(avg_x, 2),
-                    'avg_gaze_y': round(avg_y, 2)
-                },
-                'reference_metric': {
-                    'avg_attention': ref_avg_attention,
-                    'avg_gaze_x': ref_avg_gaze_x,
-                    'avg_gaze_y': ref_avg_gaze_y
-                },
-                'differences': {
-                    'diff_attention': diff_attention,
-                    'diff_gaze_x': diff_gaze_x,
-                    'diff_gaze_y': diff_gaze_y
-                }
-            }
+                    # Calcular las diferencias entre la sesión del usuario y la referencia
+                    diff_attention = round(avg_attention - ref_avg_attention, 2)
+                    diff_gaze_x = round(avg_x - ref_avg_gaze_x, 2)
+                    diff_gaze_y = round(avg_y - ref_avg_gaze_y, 2)
 
-            # Guardar el resultado de la comparación
-            cursor.execute('''
-                INSERT INTO comparative_results 
-                (user_id, session_metric_id, diff_attention, diff_gaze_x, diff_gaze_y, comparison_date, raw_comparison)
-                VALUES (%s, %s, %s, %s, %s, %s, %s)
-                RETURNING id
-            ''', (
-                user_id,
-                session_metric_id,
-                diff_attention,
-                diff_gaze_x,
-                diff_gaze_y,
-                datetime.now(),
-                json.dumps(comparison_data)
-            ))
-            comparison_id = cursor.fetchone()[0]
-            conn.commit()
-        else:
-            comparison_data = None
-            comparison_id = None
+                    comparison_data = {
+                        'session_metric': {
+                            'id': session_metric_id,
+                            'avg_attention': round(avg_attention, 2),
+                            'avg_gaze_x': round(avg_x, 2),
+                            'avg_gaze_y': round(avg_y, 2)
+                        },
+                        'reference_metric': {
+                            'avg_attention': ref_avg_attention,
+                            'avg_gaze_x': ref_avg_gaze_x,
+                            'avg_gaze_y': ref_avg_gaze_y
+                        },
+                        'differences': {
+                            'diff_attention': diff_attention,
+                            'diff_gaze_x': diff_gaze_x,
+                            'diff_gaze_y': diff_gaze_y
+                        }
+                    }
 
-        cursor.close()
+                    # Guardar el resultado de la comparación
+                    cursor.execute('''
+                        INSERT INTO comparative_results 
+                        (user_id, session_metric_id, diff_attention, diff_gaze_x, diff_gaze_y, comparison_date, raw_comparison)
+                        VALUES (%s, %s, %s, %s, %s, %s, %s)
+                        RETURNING id
+                    ''', (
+                        user_id,
+                        session_metric_id,
+                        diff_attention,
+                        diff_gaze_x,
+                        diff_gaze_y,
+                        datetime.now(),
+                        json.dumps(comparison_data)
+                    ))
+                    comparison_id = cursor.fetchone()[0]
+                    conn.commit()
+                else:
+                    comparison_data = None
+                    comparison_id = None
+
         conn.close()
 
         response = {
@@ -278,77 +263,83 @@ def save_session_data():
 # =====================================================
 @app.route('/get_results', methods=['GET'])
 def get_results():
-    user_id, error = get_user_id_from_token()
-    if error:
-        return jsonify({'success': False, 'message': error}), 401
+    # Se espera que el cliente envíe el user_id como parámetro en la URL
+    user_id = request.args.get('user_id')
+    if not user_id:
+        return jsonify({'success': False, 'message': 'user_id no proporcionado'}), 400
+    try:
+        user_id = int(user_id)
+    except ValueError:
+        return jsonify({'success': False, 'message': 'user_id inválido'}), 400
 
     conn = get_db_connection()
-    cursor = conn.cursor()
+    if conn is None:
+        return jsonify({'success': False, 'message': 'Error en la conexión a la base de datos'}), 500
 
-    # Obtener el último registro de la sesión del usuario
-    cursor.execute('''
-        SELECT id, user_id, session_date, avg_attention, avg_gaze_x, avg_gaze_y, raw_data 
-        FROM session_metrics 
-        WHERE user_id = %s 
-        ORDER BY session_date DESC LIMIT 1
-    ''', (user_id,))
-    session_data = cursor.fetchone()
-    if session_data:
-        session_result = {
-            'id': session_data[0],
-            'user_id': session_data[1],
-            'session_date': session_data[2].isoformat(),
-            'avg_attention': session_data[3],
-            'avg_gaze_x': session_data[4],
-            'avg_gaze_y': session_data[5],
-            'raw_data': session_data[6]
-        }
-    else:
-        session_result = None
+    with conn:
+        with conn.cursor() as cursor:
+            # Obtener el último registro de la sesión del usuario
+            cursor.execute('''
+                SELECT id, user_id, session_date, avg_attention, avg_gaze_x, avg_gaze_y, raw_data 
+                FROM session_metrics 
+                WHERE user_id = %s 
+                ORDER BY session_date DESC LIMIT 1
+            ''', (user_id,))
+            session_data = cursor.fetchone()
+            if session_data:
+                session_result = {
+                    'id': session_data[0],
+                    'user_id': session_data[1],
+                    'session_date': session_data[2].isoformat(),
+                    'avg_attention': session_data[3],
+                    'avg_gaze_x': session_data[4],
+                    'avg_gaze_y': session_data[5],
+                    'raw_data': session_data[6]
+                }
+            else:
+                session_result = None
 
-    # Obtener la métrica de referencia más reciente
-    cursor.execute('''
-        SELECT id, avg_attention, avg_gaze_x, avg_gaze_y, computed_date 
-        FROM reference_metrics 
-        ORDER BY computed_date DESC LIMIT 1
-    ''')
-    reference_data = cursor.fetchone()
-    if reference_data:
-        reference_result = {
-            'id': reference_data[0],
-            'avg_attention': reference_data[1],
-            'avg_gaze_x': reference_data[2],
-            'avg_gaze_y': reference_data[3],
-            'computed_date': reference_data[4].isoformat()
-        }
-    else:
-        reference_result = None
+            # Obtener la métrica de referencia más reciente
+            cursor.execute('''
+                SELECT id, avg_attention, avg_gaze_x, avg_gaze_y, computed_date 
+                FROM reference_metrics 
+                ORDER BY computed_date DESC LIMIT 1
+            ''')
+            reference_data = cursor.fetchone()
+            if reference_data:
+                reference_result = {
+                    'id': reference_data[0],
+                    'avg_attention': reference_data[1],
+                    'avg_gaze_x': reference_data[2],
+                    'avg_gaze_y': reference_data[3],
+                    'computed_date': reference_data[4].isoformat()
+                }
+            else:
+                reference_result = None
 
-    # Obtener el último resultado comparativo asociado a la sesión
-    comparative_result = None
-    if session_result:
-        cursor.execute('''
-            SELECT id, user_id, session_metric_id, diff_attention, diff_gaze_x, diff_gaze_y, comparison_date, raw_comparison 
-            FROM comparative_results 
-            WHERE user_id = %s AND session_metric_id = %s 
-            ORDER BY comparison_date DESC LIMIT 1
-        ''', (user_id, session_result['id']))
-        comp_data = cursor.fetchone()
-        if comp_data:
-            comparative_result = {
-                'id': comp_data[0],
-                'user_id': comp_data[1],
-                'session_metric_id': comp_data[2],
-                'diff_attention': comp_data[3],
-                'diff_gaze_x': comp_data[4],
-                'diff_gaze_y': comp_data[5],
-                'comparison_date': comp_data[6].isoformat(),
-                'raw_comparison': comp_data[7]
-            }
+            # Obtener el último resultado comparativo asociado a la sesión
+            comparative_result = None
+            if (session_result):
+                cursor.execute('''
+                    SELECT id, user_id, session_metric_id, diff_attention, diff_gaze_x, diff_gaze_y, comparison_date, raw_comparison 
+                    FROM comparative_results 
+                    WHERE user_id = %s AND session_metric_id = %s 
+                    ORDER BY comparison_date DESC LIMIT 1
+                ''', (user_id, session_result['id']))
+                comp_data = cursor.fetchone()
+                if comp_data:
+                    comparative_result = {
+                        'id': comp_data[0],
+                        'user_id': comp_data[1],
+                        'session_metric_id': comp_data[2],
+                        'diff_attention': comp_data[3],
+                        'diff_gaze_x': comp_data[4],
+                        'diff_gaze_y': comp_data[5],
+                        'comparison_date': comp_data[6].isoformat(),
+                        'raw_comparison': comp_data[7]
+                    }
 
-    cursor.close()
     conn.close()
-
     return jsonify({
         'success': True,
         'sessionData': session_result,
