@@ -9,7 +9,13 @@ const Dashboard = ({ onClose }) => {
   useEffect(() => {
     const fetchResults = async () => {
       try {
-        const res = await fetch("http://localhost:5000/get_results");
+        // Se recupera el user_id desde localStorage
+        const userId = localStorage.getItem("userId");
+        if (!userId) {
+          throw new Error("No se encontró el user_id");
+        }
+        // Se incluye el user_id en la query string
+        const res = await fetch(`http://localhost:5000/get_results?user_id=${userId}`);
         const json = await res.json();
         if (json.success) {
           setData(json);
@@ -23,7 +29,7 @@ const Dashboard = ({ onClose }) => {
     };
 
     fetchResults();
-  }, []); // Eliminada la dependencia del token
+  }, []);
 
   if (loading) {
     return <div className="p-4">Cargando resultados...</div>;
