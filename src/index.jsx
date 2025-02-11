@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import { motion } from 'framer-motion';
 import './index.css';
 import App from './App';
-import Login from './components/login';
+import Login from './components/Login';
 import Register from './components/Register';
 import reportWebVitals from './reportWebVitals';
 
