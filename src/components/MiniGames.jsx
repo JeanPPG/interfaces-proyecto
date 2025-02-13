@@ -1,32 +1,33 @@
+// MiniGames.jsx
 import React, { useState, useEffect } from "react";
 import "./MiniGames.css";
-import ReactionGame from "./ReactionGame"; // Importamos el juego de reacción
-import PointFollowGame from "./PointFollowGame"; // Importamos el juego "Seguir el punto"
-import FindObjectGame from "./FindObjectGame"; // Importamos el juego "Buscar el objeto"
+import ReactionGame from "./ReactionGame"; // Juego de reacción
+import PointFollowGame from "./PointFollowGame"; // Juego "Seguir el punto"
+import FindObjectGame from "./FindObjectGame"; // Juego "Buscar el objeto"
 
 const MiniGames = ({ onGameStart, onGameEnd, onAllGamesComplete }) => {
-  const [activeGame, setActiveGame] = useState(null); // Estado para controlar el juego activo
-  const [disabledGames, setDisabledGames] = useState([]); // Estado para controlar los juegos deshabilitados
+  const [activeGame, setActiveGame] = useState(null); // Controla el juego activo
+  const [disabledGames, setDisabledGames] = useState([]); // Juegos deshabilitados
 
-  // Efecto que verifica si ya se han completado los 3 minijuegos
+  // Efecto que verifica si se han completado los 3 minijuegos
   useEffect(() => {
     if (disabledGames.length === 3) {
-      onAllGamesComplete && onAllGamesComplete(); // Notifica al componente padre cuando todos los juegos están completados
+      onAllGamesComplete && onAllGamesComplete();
     }
   }, [disabledGames, onAllGamesComplete]);
 
-  // Función para manejar la activación de un juego
+  // Función para activar un juego
   const toggleGame = (game) => {
-    if (disabledGames.includes(game)) return; // Si el juego está deshabilitado, no hacer nada
-    setActiveGame((prev) => (prev === game ? null : game)); // Alternar entre mostrar/ocultar el juego
-    onGameStart && onGameStart(); // Notificar que un juego ha sido iniciado
+    if (disabledGames.includes(game)) return; // Si está deshabilitado, no hace nada
+    setActiveGame((prev) => (prev === game ? null : game)); // Alterna mostrar/ocultar el juego
+    onGameStart && onGameStart(); // Notifica que se inició un juego
   };
 
   // Función para cerrar un juego y deshabilitarlo
   const closeGame = (game) => {
-    setActiveGame(null); // Cerrar el juego
-    setDisabledGames((prev) => [...prev, game]); // Añadir el juego a la lista de deshabilitados
-    onGameEnd && onGameEnd(); // Notificar que un juego ha terminado
+    setActiveGame(null); // Cierra el juego
+    setDisabledGames((prev) => [...prev, game]); // Deshabilita el juego
+    onGameEnd && onGameEnd(); // Notifica que el juego terminó
   };
 
   return (
@@ -38,7 +39,9 @@ const MiniGames = ({ onGameStart, onGameEnd, onAllGamesComplete }) => {
         onClick={() => toggleGame("pointFollowGame")}
         className={disabledGames.includes("pointFollowGame") ? "disabled" : ""}
       >
-        {disabledGames.includes("pointFollowGame") ? "❌ Seguir el punto" : "➡️ Seguir el punto"}
+        {disabledGames.includes("pointFollowGame")
+          ? "❌ Seguir el punto"
+          : "➡️ Seguir el punto"}
       </p>
       {activeGame === "pointFollowGame" && (
         <div className="follow-game-container">
@@ -51,7 +54,9 @@ const MiniGames = ({ onGameStart, onGameEnd, onAllGamesComplete }) => {
         onClick={() => toggleGame("findObjectGame")}
         className={disabledGames.includes("findObjectGame") ? "disabled" : ""}
       >
-        {disabledGames.includes("findObjectGame") ? "❌ Buscar el objeto" : "🔍 Buscar el objeto"}
+        {disabledGames.includes("findObjectGame")
+          ? "❌ Buscar el objeto"
+          : "🔍 Buscar el objeto"}
       </p>
       {activeGame === "findObjectGame" && (
         <div className="find-object-game-container">
@@ -64,7 +69,9 @@ const MiniGames = ({ onGameStart, onGameEnd, onAllGamesComplete }) => {
         onClick={() => toggleGame("reactionGame")}
         className={disabledGames.includes("reactionGame") ? "disabled" : ""}
       >
-        {disabledGames.includes("reactionGame") ? "❌ Reacción rápida" : "⚡ Reacción rápida"}
+        {disabledGames.includes("reactionGame")
+          ? "❌ Reacción rápida"
+          : "⚡ Reacción rápida"}
       </p>
       {activeGame === "reactionGame" && (
         <div className="reaction-game-container">

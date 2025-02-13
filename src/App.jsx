@@ -19,6 +19,11 @@ const App = () => {
   const [toggleCameraEnabled, setToggleCameraEnabled] = useState(true);
   const [userId, setUserId] = useState(null);
 
+  // Nuevo estado para controlar cuándo se activa la recolección de datos
+  const [dataCollectionActive, setDataCollectionActive] = useState(false);
+  // Estado para mostrar el aviso temporal
+  const [showNotice, setShowNotice] = useState(false);
+
   // Recupera el userId desde localStorage (o de otro mecanismo de persistencia) al iniciar la app
   useEffect(() => {
     const storedUserId = localStorage.getItem("userId");
@@ -136,9 +141,21 @@ const App = () => {
   const [stopMorphcastFn, setStopMorphcastFn] = useState(null);
   const stopGazeRecorderFn = useRef(null);
 
-  // Efecto único para manejar la activación/desactivación de la cámara y guardar la sesión
+  // ---
+  // Efecto para mostrar el aviso temporal cuando se activa la cámara
   useEffect(() => {
     if (cameraEnabled) {
+      setShowNotice(true);
+      const timer = setTimeout(() => {
+        setShowNotice(false);
+      }, 5000); // Mostrar aviso 5 segundos
+      return () => clearTimeout(timer);
+    }
+  }, [cameraEnabled]);
+
+  // Efecto para iniciar/detener la recolección de datos según dataCollectionActive
+  useEffect(() => {
+    if (dataCollectionActive) {
       startMorphcast().then((stop) => setStopMorphcastFn(() => stop));
       stopGazeRecorderFn.current = startGazeRecorder();
     } else {
@@ -150,9 +167,9 @@ const App = () => {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cameraEnabled]);
+  }, [dataCollectionActive]);
 
-  // Activa el test (el botón "Iniciar Test" se habilita cuando los minijuegos se completaron)
+  // Activa el test (el botón "Iniciar Test" se habilita cuando se completan los minijuegos)
   const handleStartTest = () => {
     setTestActive(true);
   };
@@ -165,9 +182,18 @@ const App = () => {
     setToggleCameraEnabled(false); // Deshabilita la posibilidad de volver a activar la cámara
   };
 
-  // Cada vez que finaliza un minijuego se incrementa el contador
+  // Cada vez que finaliza un minijuego se incrementa el contador y se cierra el juego
   const handleGameEnd = () => {
     setGamesCompleted((prev) => prev + 1);
+    setIsMiniGameActive(false);
+  };
+
+  // Callback que se invoca al iniciar un minijuego: activa la recolección de datos y marca que hay un minijuego activo
+  const handleGameStart = () => {
+    if (!dataCollectionActive) {
+      setDataCollectionActive(true);
+    }
+    setIsMiniGameActive(true);
   };
 
   if (mostrarBienvenida) {
@@ -196,9 +222,17 @@ const App = () => {
         </div>
       )}
 
-      {cameraEnabled && !isMiniGameActive && !startTest && (
+      {cameraEnabled && !startTest && (
         <div className="right-column">
-          <MiniJuegos onGameEnd={handleGameEnd} />
+          {showNotice && (
+            <div className="notice">
+              Al iniciar un minijuego se iniciará la recolección de datos.
+            </div>
+          )}
+          <MiniJuegos
+            onGameStart={handleGameStart}
+            onGameEnd={handleGameEnd}
+          />
         </div>
       )}
     </div>
