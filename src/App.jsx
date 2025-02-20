@@ -60,7 +60,7 @@ const App = () => {
       .then((data) => {
         console.log("Datos guardados:", data);
         // Generar y descargar el archivo JSON
-        downloadJSON(payload);
+        //downloadJSON(payload);
       })
       .catch((error) => console.error("Error:", error));
   };
