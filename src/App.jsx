@@ -12,19 +12,13 @@ const App = () => {
   const [mostrarBienvenida, setMostrarBienvenida] = useState(true);
   const [cameraEnabled, setCameraEnabled] = useState(false);
   const [isMiniGameActive, setIsMiniGameActive] = useState(false);
-  const [gamesCompleted, setGamesCompleted] = useState(0); // Contador de minijuegos completados
-  const [sessionData, setSessionData] = useState({});
+  const [gamesCompleted, setGamesCompleted] = useState(0);
+  const [sessionData, setSessionData] = useState({ morphcast: [], gazeRecorder: [] });
   const [startTest, setTestActive] = useState(false);
   const [testFinished, setTestFinished] = useState(false);
   const [toggleCameraEnabled, setToggleCameraEnabled] = useState(true);
   const [userId, setUserId] = useState(null);
 
-  // Nuevo estado para controlar cuándo se activa la recolección de datos
-  const [dataCollectionActive, setDataCollectionActive] = useState(false);
-  // Estado para mostrar el aviso temporal
-  const [showNotice, setShowNotice] = useState(false);
-
-  // Recupera el userId desde localStorage (o de otro mecanismo de persistencia) al iniciar la app
   useEffect(() => {
     const storedUserId = localStorage.getItem("userId");
     if (storedUserId) {
@@ -32,31 +26,42 @@ const App = () => {
     }
   }, []);
 
-  const saveSessionData = (data) => {
+  // Función para descargar el JSON
+  const downloadJSON = (data) => {
+    const blob = new Blob([JSON.stringify(data, null, 2)], {
+      type: "application/json",
+    });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `session_data_${new Date().toISOString()}.json`;
+    link.click();
+  };
+
+  const saveSessionData = () => {
     if (!userId) {
       console.error("No se encontró userId, no se pueden guardar los datos de sesión");
       return;
     }
-    const sessionTimestamp = new Date().toISOString();
+    if (!sessionData.morphcast.length && !sessionData.gazeRecorder.length) return;
+
     const payload = {
-      user_id: userId, // Se envía el id del usuario
-      timestamp: sessionTimestamp,
-      ...data,
+      user_id: userId,
+      timestamp: new Date().toISOString(),
+      session_data: sessionData,
     };
 
+    // Llamada al backend
     fetch("http://localhost:5000/save_session_data", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     })
-      .then((response) => {
-        if (!response.ok)
-          return response.text().then((text) => {
-            throw new Error("Error en la respuesta del servidor: " + text);
-          });
-        return response.json();
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Datos guardados:", data);
+        // Generar y descargar el archivo JSON
+        downloadJSON(payload);
       })
-      .then((data) => console.log("Datos guardados:", data))
       .catch((error) => console.error("Error:", error));
   };
 
@@ -71,48 +76,33 @@ const App = () => {
         document.head.appendChild(script);
       });
 
-    await scriptLoader(
-      "https://sdk.morphcast.com/mphtools/v1.1/mphtools.js",
-      "compatibilityUI, compatibilityAutoCheck"
-    );
+    await scriptLoader("https://sdk.morphcast.com/mphtools/v1.1/mphtools.js", "compatibilityUI, compatibilityAutoCheck");
     await scriptLoader("https://ai-sdk.morphcast.com/v1.16/ai-sdk.js");
 
     const CY = window.CY;
     const loader = CY.loader();
 
     loader
-      .licenseKey("sk52c05b0d7a4c86845903a5f3e556f024c07299241fd3")
+      .licenseKey("sk9745abaac13f90436a06d81654e629794eb31e503851")
       .addModule(CY.modules().FACE_ATTENTION.name, { smoothness: 0.83 })
-      .addModule(CY.modules().DATA_AGGREGATOR.name, {
-        initialWaitMs: 2000,
-        periodMs: 1000,
-      });
+      .addModule(CY.modules().DATA_AGGREGATOR.name, { initialWaitMs: 2000, periodMs: 1000 });
 
     const { start, stop } = await loader.load();
     start();
-    window.addEventListener(
-      CY.modules().DATA_AGGREGATOR.eventName,
-      handleMorphcastData
-    );
 
-    return stop;
-  };
+    const handleMorphcastData = (e) => {
+      setSessionData((prevData) => ({
+        ...prevData,
+        morphcast: [...prevData.morphcast, { timestamp: new Date().toISOString(), data: e.detail }],
+      }));
+    };
 
-  const stopMorphcast = (stop) => {
-    if (stop) {
+    window.addEventListener(CY.modules().DATA_AGGREGATOR.eventName, handleMorphcastData);
+    
+    return () => {
       stop();
-      window.removeEventListener(
-        window.CY.modules().DATA_AGGREGATOR.eventName,
-        handleMorphcastData
-      );
-    }
-  };
-
-  const handleMorphcastData = (e) => {
-    setSessionData((prevData) => ({
-      ...prevData,
-      morphcast: [...(prevData.morphcast || []), e.detail],
-    }));
+      window.removeEventListener(CY.modules().DATA_AGGREGATOR.eventName, handleMorphcastData);
+    };
   };
 
   const startGazeRecorder = () => {
@@ -125,15 +115,14 @@ const App = () => {
       GazeRecorderAPI.Rec();
     };
 
-    script.onerror = () =>
-      console.error("Error al cargar el script de GazeRecorder");
+    script.onerror = () => console.error("Error al cargar GazeRecorder");
 
     return () => {
       GazeRecorderAPI.StopRec();
       const gazeData = GazeRecorderAPI.GetRecData();
       setSessionData((prevData) => ({
         ...prevData,
-        gazeRecorder: gazeData,
+        gazeRecorder: [...prevData.gazeRecorder, { timestamp: new Date().toISOString(), data: gazeData }],
       }));
     };
   };
@@ -141,60 +130,28 @@ const App = () => {
   const [stopMorphcastFn, setStopMorphcastFn] = useState(null);
   const stopGazeRecorderFn = useRef(null);
 
-  // ---
-  // Efecto para mostrar el aviso temporal cuando se activa la cámara
   useEffect(() => {
     if (cameraEnabled) {
-      setShowNotice(true);
-      const timer = setTimeout(() => {
-        setShowNotice(false);
-      }, 5000); // Mostrar aviso 5 segundos
-      return () => clearTimeout(timer);
-    }
-  }, [cameraEnabled]);
-
-  // Efecto para iniciar/detener la recolección de datos según dataCollectionActive
-  useEffect(() => {
-    if (dataCollectionActive) {
       startMorphcast().then((stop) => setStopMorphcastFn(() => stop));
       stopGazeRecorderFn.current = startGazeRecorder();
     } else {
-      if (stopMorphcastFn) stopMorphcast(stopMorphcastFn);
+      if (stopMorphcastFn) stopMorphcastFn();
       if (stopGazeRecorderFn.current) stopGazeRecorderFn.current();
-      if (Object.keys(sessionData).length > 0) {
-        saveSessionData(sessionData);
-        setSessionData({});
-      }
+      saveSessionData();
+      setSessionData({ morphcast: [], gazeRecorder: [] });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dataCollectionActive]);
+  }, [cameraEnabled]);
 
-  // Activa el test (el botón "Iniciar Test" se habilita cuando se completan los minijuegos)
-  const handleStartTest = () => {
-    setTestActive(true);
-  };
+  const handleStartTest = () => setTestActive(true);
 
-  // Callback que se invoca al finalizar el test D2R (se llama desde D2RTest.jsx)
   const handleTestEnd = () => {
     setTestActive(false);
     setTestFinished(true);
-    setCameraEnabled(false); // Apaga la cámara
-    setToggleCameraEnabled(false); // Deshabilita la posibilidad de volver a activar la cámara
+    setCameraEnabled(false);
+    setToggleCameraEnabled(false);
   };
 
-  // Cada vez que finaliza un minijuego se incrementa el contador y se cierra el juego
-  const handleGameEnd = () => {
-    setGamesCompleted((prev) => prev + 1);
-    setIsMiniGameActive(false);
-  };
-
-  // Callback que se invoca al iniciar un minijuego: activa la recolección de datos y marca que hay un minijuego activo
-  const handleGameStart = () => {
-    if (!dataCollectionActive) {
-      setDataCollectionActive(true);
-    }
-    setIsMiniGameActive(true);
-  };
+  const handleGameEnd = () => setGamesCompleted((prev) => prev + 1);
 
   if (mostrarBienvenida) {
     return <PantallaBienvenida onFinish={() => setMostrarBienvenida(false)} />;
@@ -208,8 +165,8 @@ const App = () => {
             setCameraEnabled={setCameraEnabled}
             cameraEnabled={cameraEnabled}
             startTest={handleStartTest}
-            gamesCompleted={gamesCompleted === 3} // Se envía true si se completaron los 3 minijuegos
-            token={null} // Si se requiere, se puede pasar el token aquí
+            gamesCompleted={gamesCompleted === 3}
+            token={null}
             testFinished={testFinished}
             toggleCameraEnabled={toggleCameraEnabled}
           />
@@ -222,17 +179,9 @@ const App = () => {
         </div>
       )}
 
-      {cameraEnabled && !startTest && (
+      {cameraEnabled && !isMiniGameActive && !startTest && (
         <div className="right-column">
-          {showNotice && (
-            <div className="notice">
-              Al iniciar un minijuego se iniciará la recolección de datos.
-            </div>
-          )}
-          <MiniJuegos
-            onGameStart={handleGameStart}
-            onGameEnd={handleGameEnd}
-          />
+          <MiniJuegos onGameEnd={handleGameEnd} />
         </div>
       )}
     </div>

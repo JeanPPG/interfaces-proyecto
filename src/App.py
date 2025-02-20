@@ -11,7 +11,7 @@ app = Flask(__name__)
 CORS(app, origins="http://localhost:3000")
 
 # Configuración de la conexión a la base de datos PostgreSQL
-DATABASE_URL = "postgresql://postgres:Nisemono27@localhost:5432/hikarishiftx"
+DATABASE_URL = "postgresql://postgres:VRvPsSaMmUUBxdYcejkLuLgXYOzZAxqf@interchange.proxy.rlwy.net:53770/railway"
 
 def get_db_connection():
     try:
@@ -101,18 +101,24 @@ def save_session_data():
 
     try:
         # Cálculo de promedios para datos de Morphcast
-        morphcast_data = data.get('morphcast', [])
+        morphcast_data = data.get('session_data', {}).get('morphcast', [])
         if morphcast_data:
-            attention_values = [d.get('faceAttention', 0) for d in morphcast_data]
-            avg_attention = sum(attention_values) / len(attention_values)
+            # Extraemos las atenciones de los datos de Morphcast
+            attention_values = []
+            for mcast in morphcast_data:
+                attention = mcast.get('data', {}).get('attention', {}).get('avg', 0)
+                attention_values.append(attention)
+            avg_attention = sum(attention_values) / len(attention_values) if attention_values else 0
         else:
             avg_attention = 0
 
         # Cálculo de promedios para datos de GazeRecorder
-        gaze_data = data.get('gazeRecorder', {}).get('gazePoints', [])
+        gaze_data = data.get('session_data', {}).get('gazeRecorder', [])
         if gaze_data:
-            avg_x = sum(p.get('x', 0) for p in gaze_data) / len(gaze_data)
-            avg_y = sum(p.get('y', 0) for p in gaze_data) / len(gaze_data)
+            gaze_x_values = [gaze.get('x', 0) for gaze in gaze_data]
+            gaze_y_values = [gaze.get('y', 0) for gaze in gaze_data]
+            avg_x = sum(gaze_x_values) / len(gaze_x_values) if gaze_x_values else 0
+            avg_y = sum(gaze_y_values) / len(gaze_y_values) if gaze_y_values else 0
         else:
             avg_x, avg_y = 0, 0
 
@@ -123,7 +129,7 @@ def save_session_data():
         with conn:
             with conn.cursor() as cursor:
                 # Crear tabla session_metrics (si no existe) con relación al usuario
-                cursor.execute('''
+                cursor.execute(''' 
                     CREATE TABLE IF NOT EXISTS session_metrics (
                         id SERIAL PRIMARY KEY,
                         user_id INTEGER REFERENCES users(id),
@@ -155,7 +161,6 @@ def save_session_data():
                 # -------------------------------
                 # Comparación automática
                 # -------------------------------
-                # Crear tabla de métricas de referencia (si no existe)
                 cursor.execute('''
                     CREATE TABLE IF NOT EXISTS reference_metrics (
                         id SERIAL PRIMARY KEY,
@@ -166,7 +171,6 @@ def save_session_data():
                     )
                 ''')
 
-                # Crear tabla para resultados comparativos (si no existe)
                 cursor.execute('''
                     CREATE TABLE IF NOT EXISTS comparative_results (
                         id SERIAL PRIMARY KEY,
