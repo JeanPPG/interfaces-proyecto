@@ -140,6 +140,7 @@ const PointGame = ({ onClose }) => {
                             <button
                                 className="close-button"
                                 onClick={reiniciarJuego}
+                                style={{fontSize: '18px'}}
                             >
                                 <X size={18} /> Cerrar Juego
                             </button>
@@ -152,12 +153,16 @@ const PointGame = ({ onClose }) => {
                             e.stopPropagation();
                             setJugando(true);
                         }}
-                        initial={{ scale: 1 }}
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1, top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }} // Movimiento para centrar
+                        transition={{ type: 'spring', stiffness: 300 }}
+                        style={{
+                            position: 'absolute',  // Esto asegura que el botón se posicione respecto al contenedor
+                        }}
                     >
                         <Play size={20} /> Comenzar
                     </motion.button>
+
                 )}
             </div>
         </div>
