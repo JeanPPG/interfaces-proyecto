@@ -10,7 +10,7 @@ Bienvenido a este proyecto de **evaluación del nivel de atención de estudiante
 - 📊 **APIs integradas** para reconocimiento facial y rastreo ocular:  
   - **Morphcast** para emociones y atención.  
   - **GazeRecorder** para análisis de mirada.  
-- 💾 **Backend** con **Node.js** y **Flash** para almacenar datos de sesión.  
+- 💾 **Backend** con **Python Flask** y **PostgreSQL** para almacenamiento y gestión de datos. 
 
 ---
 
@@ -47,7 +47,7 @@ npm run start
 ## 🎮 **Cómo Usar la Aplicación**
 Accede a http://localhost:3000 en tu navegador.
 Activa la cámara y selecciona un minijuego.
-Al desactivar la cámara, los datos de la sesión se guardarán automáticamente en el backend.
+Al acabar todos los test, los datos de la sesión se guardarán automáticamente en el backend.
 
 ## 📂 **Estructura del Proyecto**
 ```text
@@ -75,7 +75,3 @@ Captura de Datos: Morphcast y GazeRecorder recopilan datos de emociones y mirada
 Almacenamiento: Los datos se guardan automáticamente como archivos JSON en el servidor.
 Análisis: Los datos JSON son compatibles para análisis avanzado en Python.
 
-## 🧪 **Pruebas y Depuración**
-Verifica que el servidor esté activo en http://localhost:5000.
-Asegúrate de que la cámara esté habilitada en tu navegador.
-Revisa los archivos JSON generados para confirmar que los datos se guardan correctamente.
