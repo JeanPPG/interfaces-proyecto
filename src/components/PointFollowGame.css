@@ -10,13 +10,13 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
+    min-height: 92vh;
 }
 
 #game-board {
     position: relative;
     width: 600px;
-    height: 600px;
+    height: 550px;
     background: #252525;
     border-radius: 16px;
     overflow: hidden;

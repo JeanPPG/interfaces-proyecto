@@ -10,22 +10,18 @@ body {
 .main-container {
   display: flex;
   min-height: 100dvh;
-  /* ✅ Usa min-height en lugar de height */
   width: 100%;
   flex-direction: column;
-  justify-content: flex-start;
-  /* ✅ Alinea elementos al inicio (arriba) */
+  justify-content: center;
   align-items: center;
   background: linear-gradient(135deg, #1f1f1f, #0f0f0f);
   overflow-y: auto;
-  /* ✅ Permite scroll vertical si el contenido excede */
 }
 
 .app-title {
   font-size: 3rem;
   font-weight: 700;
   color: #c5003c;
-  /* Azul cibernético */
   text-align: center;
   text-transform: uppercase;
   letter-spacing: 2px;
@@ -62,8 +58,9 @@ body {
 
 .auth-container {
   display: flex;
-  justify-content: space-between;
-  width: 80%;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
   max-width: 1200px;
   margin-top: 30px;
 }
