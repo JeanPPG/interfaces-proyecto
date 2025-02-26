@@ -15,7 +15,7 @@ const Dashboard = ({ onClose }) => {
           throw new Error("No se encontró el user_id");
         }
         // Se incluye el user_id en la query string
-        const res = await fetch(`http://localhost:5000/get_results?user_id=${userId}`);
+        const res = await fetch(`https://backend-flask-production.up.railway.app/get_results?user_id=${userId}`);
         const json = await res.json();
         if (json.success) {
           setData(json);
